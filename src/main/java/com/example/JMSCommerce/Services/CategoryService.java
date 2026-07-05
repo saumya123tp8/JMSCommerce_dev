@@ -19,10 +19,11 @@ public class CategoryService {
     }
 
 
-    public void createCategory(CreateCategoryRequestDTO createCategoryRequestDTO) {
+    public Category createCategory(CreateCategoryRequestDTO createCategoryRequestDTO) {
 
         Category category = Category.builder().name(createCategoryRequestDTO.getName()).build();
         categoryRepo.save(category);
+        return category;
     }
 
     public Category getCategoryById(Long id) {

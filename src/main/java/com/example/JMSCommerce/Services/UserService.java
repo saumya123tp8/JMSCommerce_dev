@@ -18,9 +18,10 @@ public class UserService {
         return userRepo.findAll();
     }
 
-    public void createUser(UserDTO userDTO) {
+    public User createUser(UserDTO userDTO) {
 
         User user = User.builder().age(userDTO.getAge()).fname(userDTO.getFname()).lname(userDTO.getLname()).build();
         userRepo.save(user);
+        return user;
     }
 }

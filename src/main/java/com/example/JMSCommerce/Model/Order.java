@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity
 @Builder
 @Table(name = "orders")
-public class Orders extends BaseEntity{
+public class Order extends BaseEntity{
 
     private OrderStatus status;
     @Column(name = "current_subtotal")

@@ -3,6 +3,8 @@ package com.example.JMSCommerce.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class OrderProduct extends BaseEntity{
     //order_product has fk of order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    private Orders orders;
+    private Order order;
 
     //Similiarly
     //if we check that many order_product entries can be there for one product
@@ -26,6 +28,10 @@ public class OrderProduct extends BaseEntity{
     private Product product;
 
     @Column(nullable = false)
-    private Integer quntity;
+    private Integer quantity;
+    @Column(nullable = false,name = "current_price")
+    private BigDecimal currentPrice;
+    @Column(name = "current_discount")
+    private BigDecimal currentDiscount = BigDecimal.ZERO;
 
 }

@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS orders (
                         created_at DATETIME NOT NULL,
                         updated_at DATETIME,
                         deleted_at DATETIME,
---                         status VARCHAR(255)
-                        status TINYINT
+--                      status VARCHAR(255)
+                        status TINYINT,
+                        current_subtotal DECIMAL(19,2),
+                        delivered_at VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -47,12 +49,13 @@ CREATE TABLE IF NOT EXISTS product (
 CREATE TABLE IF NOT EXISTS order_product (
                                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                created_at DATETIME NOT NULL,
+                               current_price DECIMAL(38,2),
+                               current_discount DECIMAL(38,2),
                                updated_at DATETIME,
                                deleted_at DATETIME,
-
                                order_id BIGINT NOT NULL,
                                product_id BIGINT NOT NULL,
-                               quntity INT NOT NULL,
+                               quantity INT NOT NULL,
 
                                CONSTRAINT fk_order_product_order
                                    FOREIGN KEY (order_id)

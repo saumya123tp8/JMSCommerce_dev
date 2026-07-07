@@ -1,7 +1,8 @@
 package com.example.JMSCommerce.DTOs;
 
-import com.example.JMSCommerce.Model.OrderStatus;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -9,5 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class CreateOrderRequestDTO {
-    private OrderStatus status;
+    private Long userId;
+    private String deliveredAt;
+    private List<OrderItemRequestDTO> productsInOrder;
 }

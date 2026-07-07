@@ -3,6 +3,8 @@ package com.example.JMSCommerce.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -13,7 +15,10 @@ import lombok.*;
 public class Orders extends BaseEntity{
 
     private OrderStatus status;
-
+    @Column(name = "current_subtotal")
+    private BigDecimal currentSubtotal;
+    @Column(name = "delivered_at")
+    private String deliveredAt;
 //    @ManyToMany
 //    @JoinTable(
 //            name = "order_products",

@@ -25,11 +25,11 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createOrder(@RequestBody CreateOrderRequestDTO createOrderRequestDTO){
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> createOrder(@RequestBody CreateOrderRequestDTO createOrderRequestDTO){
 //        orderService.createOrder(createOrderRequestDTO);
         System.out.println("Inside createOrder");
-        orderService.createOrder(createOrderRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null,"Order Created Successfully"));
+        GetOrderResponseDTO getOrderResponseDTO= orderService.createOrder(createOrderRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(getOrderResponseDTO,"Order Created Successfully"));
     }
 
     @GetMapping("/{id}")

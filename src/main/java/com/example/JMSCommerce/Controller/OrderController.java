@@ -2,6 +2,7 @@ package com.example.JMSCommerce.Controller;
 
 import com.example.JMSCommerce.DTOs.CreateOrderRequestDTO;
 import com.example.JMSCommerce.DTOs.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.UpdateOrderReqDTO;
 import com.example.JMSCommerce.Model.Order;
 import com.example.JMSCommerce.Services.OrderService;
 import com.example.JMSCommerce.Utility.ApiResponse;
@@ -37,6 +38,17 @@ public class OrderController {
 //        return orderService.getOrderByOrderId(id);
         return ResponseEntity.ok().body(ApiResponse.success(orderService.getOrderByOrderId(id),"order data fetched successfully"));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteOrderByOrderId(@PathVariable Long id){
+        return ResponseEntity.ok().body(ApiResponse.success(orderService.deleteOrderByOrderId(id),"order deleted successfully"));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> deleteOrderByOrderId(@PathVariable Long id, @RequestBody UpdateOrderReqDTO updateOrderReqDTO){
+        return ResponseEntity.ok().body(ApiResponse.success(orderService.updateOrderByOrderId(id,updateOrderReqDTO),"order deleted successfully"));
+    }
+
 
 
 //    @GetMapping("/{id}")

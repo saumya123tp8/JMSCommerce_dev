@@ -27,7 +27,7 @@ public class ProductService {
     //    public List<Product> getAllProducts() {
 //        return productRepo.findAll();
 //    }
-    public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         List<Product> products = productRepo.findAll();
         List<ProductResponseDTO> listProducts = products.stream().map(product -> ProductResponseDTO.builder().title(product.getTitle())
                 .id(product.getId())
@@ -37,10 +37,10 @@ public class ProductService {
                 .image(product.getImage())
                 .build()
         ).collect(Collectors.toList());
-        return ResponseEntity.ok(ApiResponse.success(listProducts, "Fetched All Product"));
+        return listProducts;
     }
 
-    public ResponseEntity<ApiResponse<Product>> createProduct(ProductCreateDTO productCreateDTO) {
+    public Product createProduct(ProductCreateDTO productCreateDTO) {
         Category category = categoryService.getCategoryById(productCreateDTO.getCategory());
         Product product = Product.builder()
                 .title(productCreateDTO.getTitle())
@@ -51,29 +51,25 @@ public class ProductService {
                 .rating(productCreateDTO.getRating())
                 .build();
         productRepo.save(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(product, "Product Created Successfully"));
+        return product;
     }
 
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(Long id) {
+    public Void deleteProduct(Long id) {
         Product product = productRepo.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Product with id " + id + " not found"));
 
         productRepo.delete(product);
-
-        return ResponseEntity.ok(
-                ApiResponse.success(null, "Product deleted successfully")
-        );
+        return null;
     }
-
     //    public List<Product> getProductByCategory(String category) {
 //
 //        return productRepo.findByCategory(category);
 //    }
-    public ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(Long category_id) {
+    public List<ProductResponseDetailsDTO> getProductByCategory(Long category_id) {
         List<ProductResponseDetailsDTO> productListWithGivenCategory =
-                productRepo.findByCategory(category_id).stream().map(
+                productRepo.findByCategory_Id(category_id).stream().map(
                         product -> ProductResponseDetailsDTO.builder()
                                 .id(product.getId())
                                 .title(product.getTitle())
@@ -87,8 +83,7 @@ public class ProductService {
         if (productListWithGivenCategory.isEmpty()) {
             throw new ResourceNotFoundException("Product with Category" + category_id + " not found");
         }
-        return ResponseEntity.ok(ApiResponse.success(productListWithGivenCategory, "Product Details Fetched Successfully"))
-
+        return productListWithGivenCategory;
 //        return productRepo.findByCategory(category_id);
     }
 
@@ -98,7 +93,7 @@ public class ProductService {
 //       );
 //    }
 
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductByID(Long id) {
+    public ProductResponseDTO getProductByID(Long id) {
         ProductResponseDTO response = productRepo.findById(id).map(
                         product ->
                                 ProductResponseDTO.builder().title(product.getTitle())
@@ -111,10 +106,11 @@ public class ProductService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Product with given Id not found")
                 );
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response, "Product with given Id fetched successfully"));
+        return response;
     }
 
-    public ResponseEntity<ApiResponse<ProductResponseDetailsDTO>> findProductDetailById(Long id) {
+    public ProductResponseDetailsDTO findProductDetailById(Long id)
+    {
         ProductResponseDetailsDTO productResponseDetailsDTO = productRepo.findProductDetailById(id).map(
                 product -> ProductResponseDetailsDTO.builder()
                         .id(product.getId())
@@ -129,7 +125,6 @@ public class ProductService {
                 () -> new ResourceNotFoundException("Product with id " + id + " not found")
         );
 
-        return ResponseEntity.ok(ApiResponse.success(productResponseDetailsDTO, "Product Details Fetched Successfully"))
-
+        return productResponseDetailsDTO;
     }
 }

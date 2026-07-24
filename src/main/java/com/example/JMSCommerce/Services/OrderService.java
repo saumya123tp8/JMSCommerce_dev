@@ -2,23 +2,33 @@ package com.example.JMSCommerce.Services;
 
 import com.example.JMSCommerce.Adapters.OrderAdapter;
 import com.example.JMSCommerce.DTOs.*;
+import com.example.JMSCommerce.Exception.BadRequestException;
+import com.example.JMSCommerce.Exception.CompulsoryDataMissingException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.*;
 import com.example.JMSCommerce.Repositories.OrderProductRepo;
 import com.example.JMSCommerce.Repositories.OrderRepo;
 import com.example.JMSCommerce.Repositories.ProductRepo;
 import com.example.JMSCommerce.Repositories.UserRepo;
+import com.example.JMSCommerce.Utility.SecurityUtils;
+import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -38,7 +48,7 @@ public class OrderService {
     public GetOrderResponseDTO createOrder(CreateOrderRequestDTO createOrderRequestDTO) {
 
         User user = userRepo.findById(createOrderRequestDTO.getUserId()).orElseThrow(
-                () -> new RuntimeException("User not found")
+                () -> new ResourceNotFoundException("User not found")
         );
 
         Order order = Order.builder()
@@ -73,32 +83,35 @@ public class OrderService {
             orderRepo.save(order);
             orderProductRepo.saveAll(listOrderProduct);
         }
-        System.out.println("order"+order);
-        System.out.println("order_product");
        return orderAdapter.mapToGetOrderResponseDTO(order);
     }
 
     public GetOrderResponseDTO getOrderByOrderId(Long id) {
         Order order = orderRepo.findById(id).orElseThrow(
-                () -> new RuntimeException(
+                () -> new ResourceNotFoundException(
                         "Order not found"
                 )
         );
-        System.out.println("order");
-        System.out.println(order.getId());
         return orderAdapter.mapToGetOrderResponseDTO(order);
     }
 
     @Transactional
     public Void deleteOrderByOrderId(Long id) {
-        orderProductRepo.deleteByOrderId(id);
+        Order order = orderRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "Order not found"
+                )
+        );
+        orderProductRepo.deleteByOrder_Id(id);
         orderRepo.deleteById(id);
         //order of deletion is important otherwise it will give fk_constraints error
         return null;
     }
 
-    public GetOrderResponseDTO updateOrderByOrderId(Long id,UpdateOrderReqDTO updateOrderReqDTO) {
-        Order order = orderRepo.findById(id).orElseThrow(()->new RuntimeException("order not found"));
+
+
+
+    private GetOrderResponseDTO CommonMethodToUpdateOrder(UpdateOrderReqDTO updateOrderReqDTO, Order order) {
         if(updateOrderReqDTO.getStatus()!=null){
             order.setStatus(updateOrderReqDTO.getStatus());
             orderRepo.save(order);
@@ -112,8 +125,8 @@ public class OrderService {
             Map<Long, Product> productMap = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
 
             for(Long pid : listProductIds){
-                if(!productMap.containsKey(id)){
-                    throw new RuntimeException("Product not found with id: " + id);
+                if(!productMap.containsKey(pid)){
+                    throw new ResourceNotFoundException("Product not found with id: " + pid);
                 }
             }
 
@@ -145,14 +158,14 @@ public class OrderService {
                     }
                     case REMOVE -> {
                         if(existing == null) {
-                            throw new RuntimeException("Product not found with id: " + product.getId());
+                            throw new ResourceNotFoundException("Product not found with id: " + product.getId());
                         }
                         toDelete.add(existing);
                         existingItems.remove(product.getId());
                     }
                     case INCREMENT -> {
                         if(existing == null) {
-                            throw new RuntimeException("Product not found with id: " + product.getId());
+                            throw new ResourceNotFoundException("Product not found with id: " + product.getId());
                         }
                         existing.setQuantity(existing.getQuantity() + 1);
                         toSave.add(existing);
@@ -160,7 +173,7 @@ public class OrderService {
                     }
                     case DECREMENT -> {
                         if(existing == null) {
-                            throw new RuntimeException("Product not found with id: " + product.getId());
+                            throw new ResourceNotFoundException("Product not found with id: " + product.getId());
                         }
                         if(existing.getQuantity() <= 1) {
                             toDelete.add(existing);
@@ -183,15 +196,82 @@ public class OrderService {
                 orderProductRepo.deleteAll(toDelete);
             }
         }
-            return orderAdapter.mapToGetOrderResponseDTO(order);
+        return orderAdapter.mapToGetOrderResponseDTO(order);
     }
 
-//    public List<Orders> getAllOrderByUserId(Long id) {
-//        userRepo.findById(id)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//        return orderRepo.findByUserId(id);
-//    }
+    public GetOrderResponseDTO updateOrderByOrderIdCurrUser(Long id, UpdateOrderReqDTO updateOrderReqDTO) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        Order order = orderRepo
+                .findByIdAndUser_Id(id, currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        return CommonMethodToUpdateOrder(updateOrderReqDTO, order);
+
+    }
 
 
+    public GetOrderResponseDTO updateOrderByOrderId(Long id,UpdateOrderReqDTO updateOrderReqDTO) {
+        Order order = orderRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("order not found"));
+        return CommonMethodToUpdateOrder(updateOrderReqDTO, order);
+    }
 
+    public Void updateOrderStatus(Long id,UpdateOrderReqDTO updateOrderReqDTO) {
+        Order order = orderRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("order not found"));
+        if(updateOrderReqDTO.getStatus()!=null){
+            order.setStatus(updateOrderReqDTO.getStatus());
+            orderRepo.save(order);
+        }else{
+            throw new CompulsoryDataMissingException("Status is missing");
+        }
+        return null;
+    }
+
+    // this will check order and return only if order is related to the current authenticated user
+    public GetOrderResponseDTO getOrderByOrderIdCurrUser(Long orderId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        Order order = orderRepo
+                .findByIdAndUser_Id(orderId, currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        return orderAdapter.mapToGetOrderResponseDTO(order);
+    }
+
+    public Void deleteOrderByOrderIdCurrUser(Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        Order order = orderRepo
+                .findByIdAndUser_Id(id, currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        orderRepo.delete(order);
+        return null;
+    }
+
+
+    public List<GetOrderResponseDTO> getAllOrderByUserId(Long userId) {
+
+        List<Order> orders = orderRepo.findAllByUser_Id(userId);
+
+        return orders.stream()
+                .map(orderAdapter::mapToGetOrderResponseDTO)
+                .toList();
+
+    }
+
+    public List<GetOrderResponseDTO> getAllOrderByOrderStatus(String status) {
+        OrderStatus orderStatus;
+
+        try {
+            orderStatus = OrderStatus.valueOf(status.toUpperCase().trim());
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("Invalid order status : " + status);
+        }
+
+        List<Order> orders = orderRepo.findAllByStatus(orderStatus);
+
+        return orders.stream()
+                .map(orderAdapter::mapToGetOrderResponseDTO)
+                .toList();
+    }
 }

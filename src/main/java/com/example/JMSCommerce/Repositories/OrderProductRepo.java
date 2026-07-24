@@ -11,9 +11,9 @@ import java.util.List;
 
 @Repository
 public interface OrderProductRepo extends JpaRepository<OrderProduct,Long> {
-    public List<OrderProduct> findByOrderId(Long orderId) ;
+    public List<OrderProduct> findByOrder_Id(Long orderId) ;
 
-    void deleteByOrderId(Long id);
+    void deleteByOrder_Id(Long id);
 
     @Query("SELECT op FROM OrderProduct op JOIN FETCH op.product WHERE op.order = :order")
     Collection<OrderProduct> findByOrderWithProduct(Order order);

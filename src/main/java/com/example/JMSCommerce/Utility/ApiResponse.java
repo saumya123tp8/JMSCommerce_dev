@@ -17,6 +17,7 @@ public class ApiResponse<T> {
     private T data;
     private String error;
     private LocalDateTime timestamp;
+    private String path;
     public static <T> ApiResponse<T> success(T data, String message){
       return ApiResponse.<T>builder()
                 .success(true)
@@ -27,12 +28,13 @@ public class ApiResponse<T> {
 
     }
 
-    public static <T> ApiResponse<T> error(String error, String message){
+    public static <T> ApiResponse<T> error(String error, String message, String path){
         return ApiResponse.<T>builder()
                 .success(false)
                 .message(message)
                 .error(error)
                 .timestamp(LocalDateTime.now())
+                .path(path)
                 .build();
 
     }

@@ -8,11 +8,55 @@ spring:
 
   jpa:
     hibernate:
-#      ddl-auto: update
-       ddl-auto: validate #shifting to flyway migration now change in schema will not directly affect the table
+      ddl-auto: update
+#       ddl-auto: validate #shifting to flyway migration now change in schema will not directly affect the table
     show-sql: true
 
   flyway:
     enable: true
     location: classpath:db/migration
 
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:test-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:test-client-secret}
+            scope:
+              - email
+              - profile
+              - openid
+          github:
+            client-id: ${GITHUB_CLIENT_ID:test-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:test-client-secret}
+            scope:
+              - user:email
+              - read:user
+  # /login/oauth2/code/google
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+security:
+  jwt:
+    #    keep jwt secret long otherwise it will cause errorn in creating beans, failed in constructor
+    secret: ${JWT_SECRET:buwfueunnin2984ygyjhvgyvyjhhbhvyctdtdtgyuyjgyugygyftydrdrtcthgvgjvgdjnjkn!*#njhb}
+    issuer: ${JWT_ISSUER:api.substring.com}
+    access-ttl-seconds: ${JWT_TTL:200000}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL:600000}
+    refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshTokenCookieName}
+    cookie-secure: ${JWT_COOKIE_SECURE:True}
+    cookie-http-only: ${JWT_HTTP_COOKIE_ONLY:True}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    refresh-token-cookie-domain: ${JWT_REFRESH_COOKIE_domain:}
+#  o ath2 configuration
+app:
+  cors:
+    frontend_url: http://localhost:5173/
+  auth:
+    frontend:
+      success_url: http://localhost:5173/oauth/success
+      fail_url: http://localhost:5173/oauth/fail

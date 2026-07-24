@@ -1,4 +1,4 @@
-package com.example.JMSCommerce.Model;
+package com.example.JMSCommerce.Utility.enums;
 
 public enum OrderStatus {
     Delivered,

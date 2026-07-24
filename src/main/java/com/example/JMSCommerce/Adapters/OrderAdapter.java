@@ -22,7 +22,7 @@ public class OrderAdapter {
     }
     public GetOrderResponseDTO mapToGetOrderResponseDTO(Order order) {
        List<OrderProduct> listOrderItem = new ArrayList<>();
-       listOrderItem = orderProductRepo.findByOrderId(order.getId());
+       listOrderItem = orderProductRepo.findByOrder_Id(order.getId());
         System.out.println("order_product");
 //        System.out.println(listOrderItem);
         listOrderItem.forEach(System.out::println);

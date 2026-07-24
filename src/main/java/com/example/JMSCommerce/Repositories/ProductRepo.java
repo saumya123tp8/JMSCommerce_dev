@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface ProductRepo extends JpaRepository<Product,Long> {
 //    List<Product> findByCategory(String category);
 //    Now I will search based upon category id
-List<Product>findByCategory(Long category_id);
+List<Product>findByCategory_Id(Long category_id);
 
 // this gives error because while selecting we have id column 2 times for id and product
 //@Query(nativeQuery = true,

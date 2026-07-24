@@ -1,16 +1,29 @@
 package com.example.JMSCommerce.DTOs;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.JMSCommerce.Utility.enums.Provider;
+import lombok.*;
+
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserDTO {
-    private String fname;
-    private String lname;
-    private int age;
+        private String email;
+        private String name;
+        private String password;
+        private String image;
+        private String phone;
+        private Integer age;
+        private Provider provider;
+        @Builder.Default
+        private Set<RoleDTO> roles=new HashSet<>();
+//    public boolean getEnabled() {
+//    }
+
 }

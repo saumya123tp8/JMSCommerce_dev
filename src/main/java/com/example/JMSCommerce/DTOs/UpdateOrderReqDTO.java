@@ -1,6 +1,6 @@
 package com.example.JMSCommerce.DTOs;
 
-import com.example.JMSCommerce.Model.OrderStatus;
+import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

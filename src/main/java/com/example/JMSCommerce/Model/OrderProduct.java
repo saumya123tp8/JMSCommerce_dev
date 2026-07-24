@@ -32,6 +32,7 @@ public class OrderProduct extends BaseEntity{
     @Column(nullable = false,name = "current_price")
     private BigDecimal currentPrice;
     @Column(name = "current_discount")
+    @Builder.Default
     private BigDecimal currentDiscount = BigDecimal.ZERO;
 
 }

@@ -3,9 +3,16 @@ package com.example.JMSCommerce.Controller;
 
 import com.example.JMSCommerce.DTOs.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.ProductResponseDTO;
+import com.example.JMSCommerce.DTOs.ProductResponseDetailsDTO;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
+import com.example.JMSCommerce.Utility.ApiResponse;
+import com.example.JMSCommerce.Utility.AppConstants;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,47 +24,45 @@ public class ProductController {
 
     private final ProductService productService;
 
-//    @GetMapping
-//    private List<Product> getAllProducts(){
-//        return productService.getAllProducts();
-//    }
-@GetMapping
-private List<ProductResponseDTO> getAllProducts(){
-    return productService.getAllProducts();
-}
-
-    @PostMapping
-    private Product createProduct(@RequestBody ProductCreateDTO productCreateDTO){
-        return productService.createProduct(productCreateDTO);
+    @GetMapping
+    @PermitAll
+    private ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts(){
+        return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts(),"Fetched All Product"));
     }
 
+    @PostMapping
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    private ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(productService.createProduct(productCreateDTO), "Product Created Successfully"));
+    }
 
     @DeleteMapping("/{id}")
-    private void deleteProduct(@PathVariable Long id){
-         productService.deleteProduct(id);
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    private ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id){
+        return ResponseEntity.ok(ApiResponse.success(productService.deleteProduct(id),"Product Deleted Successfully"));
     }
 
     @GetMapping("/{id}")
-    private ProductResponseDTO getProductByID(@PathVariable Long id){
-        return productService.getProductByID(id);
+    @PermitAll
+    private ResponseEntity<ApiResponse<ProductResponseDTO>> getProductByID(@PathVariable Long id){
+        return ResponseEntity.ok(ApiResponse.success(productService.getProductByID(id),"Product with given id"));
     }
 
     @GetMapping("/{id}/details")
-    private Product getProductDetailByID(@PathVariable Long id){
-        return productService.findProductDetailById(id);
+    @PermitAll
+    private ResponseEntity<ApiResponse<ProductResponseDetailsDTO>> getProductDetailByID(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.findProductDetailById(id), "Product detail with given Id fetched successfully"));
+
     }
 
 
 
-
-//    @GetMapping("/search")
-//    private List<Product> getProductByCategory(@RequestParam("categoryName") String category){
-//        return productService.getProductByCategory(category);
-//    }
-
     @GetMapping("/search")
-    private List<Product> getProductByCategory(@RequestParam("categoryName") Long category_id){
-        return productService.getProductByCategory(category_id);
+    @PermitAll
+    private ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(@RequestParam("categoryName") Long category_id){
+
+        return ResponseEntity.ok(ApiResponse.success(productService.getProductByCategory(category_id), "Product Details Fetched Successfully"));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.JMSCommerce.Model;
 
+import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

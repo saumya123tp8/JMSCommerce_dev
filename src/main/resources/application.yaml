@@ -60,3 +60,6 @@ app:
     frontend:
       success_url: http://localhost:5173/oauth/success
       fail_url: http://localhost:5173/oauth/fail
+product:
+  utility:
+    maxInheritValueForCategory: 4

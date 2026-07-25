@@ -16,6 +16,7 @@ public class CategoryAdapter {
                 .slug(category.getSlug())
                 .description(category.getDescription())
                 .status(category.getStatus())
+                .level(category.getLevel())
                 .parentId(
                         category.getParent() == null
                                 ? null

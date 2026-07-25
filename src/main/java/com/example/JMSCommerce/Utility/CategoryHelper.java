@@ -6,12 +6,15 @@ import com.example.JMSCommerce.Model.Category;
 import com.example.JMSCommerce.Repositories.CategoryRepo;
 import com.example.JMSCommerce.Utility.enums.CategoryStatus;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class CategoryHelper {
     private final CategoryRepo categoryRepository;
+
     public String generateUniqueSlug(String name){
 
         String baseSlug = SlugUtil.toSlug(name);
@@ -95,7 +98,9 @@ public class CategoryHelper {
 
     public void validateParent(Category category, Category parent) {
 
+
         if (parent == null) {
+
             return;
         }
 

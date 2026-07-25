@@ -20,4 +20,6 @@ public class CategoryResponseDTO {
 
     private Long parentId;
 
+    private int level;
+
 }

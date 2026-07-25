@@ -51,4 +51,7 @@ public class Category extends BaseEntity{
     @Builder.Default
     private List<Category> children = new ArrayList<>();
 
+    @Builder.Default
+    private Integer level = 2;
+
 }

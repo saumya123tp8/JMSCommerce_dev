@@ -4,6 +4,7 @@ import com.example.JMSCommerce.Adapters.CategoryAdapter;
 import com.example.JMSCommerce.DTOs.CategoryResponseDTO;
 import com.example.JMSCommerce.DTOs.CreateCategoryRequestDTO;
 import com.example.JMSCommerce.DTOs.UpdateCategoryRequestDTO;
+import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.Category;
 import com.example.JMSCommerce.Repositories.CategoryRepo;
@@ -14,6 +15,7 @@ import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +30,8 @@ public class CategoryService {
     private final CategoryAdapter categoryAdapter;
     private final CategoryHelper categoryHelper;
     private final ProductRepo productRepo;
-
+    @Value("${product.utility.maxInheritValueForCategory}")
+    private int maxLeveAllowed;
 
 
     public List<CategoryResponseDTO> getAllCategories() {
@@ -65,7 +68,17 @@ public class CategoryService {
                 .status(CategoryStatus.ACTIVE)
                 .parent(parent)
                 .build();
-
+        if(parent == null ){
+            category.setLevel(1);
+        }else{
+            int new_level = parent.getLevel()+1;
+            if(new_level > maxLeveAllowed){
+                throw new BadRequestException(
+                        "select different parent, max inheritance leve " + maxLeveAllowed
+                );
+            }
+            category.setLevel(new_level);
+        }
         categoryRepo.save(category);
 
 

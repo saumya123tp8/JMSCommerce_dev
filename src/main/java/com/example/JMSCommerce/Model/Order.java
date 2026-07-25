@@ -20,6 +20,8 @@ public class Order extends BaseEntity{
     private BigDecimal currentSubtotal;
     @Column(name = "delivered_at")
     private String deliveredAt;
+    @ManyToOne
+    private User user;
 //    @ManyToMany
 //    @JoinTable(
 //            name = "order_products",

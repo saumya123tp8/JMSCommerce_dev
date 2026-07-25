@@ -1,13 +1,18 @@
 package com.example.JMSCommerce.Exception;
 
 import com.example.JMSCommerce.Utility.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -63,6 +68,42 @@ public class GlobalExceptionHandler {
     )
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialException(BadCredentialsCustomException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage(),"Bad Request",null));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(
+            MethodArgumentNotValidException ex) {
+
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .toList();
+        StringBuffer concatErrors = new StringBuffer("");
+        for(String err : errors){
+            concatErrors.append(err);
+        }
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(
+                        "Validation Failed",
+                        concatErrors.toString(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(
+                        ApiResponse.error(
+                                "Access Denied",
+                                "You don't have permission to perform this action.",
+                                request.getRequestURI()
+                        )
+                );
     }
 
 }

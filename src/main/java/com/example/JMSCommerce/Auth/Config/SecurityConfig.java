@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -62,6 +63,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests ->
 
                                 authorizeHttpRequests
+                                        .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET,"/api/v1/product/**").permitAll()
                                         .requestMatchers("/api/v1/reviews/**").permitAll()
                                         .requestMatchers("/api/v1/auth/register").permitAll()
                                         .requestMatchers("/api/v1/auth/login").permitAll()

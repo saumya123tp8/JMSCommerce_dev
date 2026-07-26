@@ -49,10 +49,10 @@ public class OrderAdapter {
         return OrderItemResponseDTO.builder()
                 .productId(orderProduct.getProduct().getId())
                 .quantity(orderProduct.getQuantity())
-                .productImage((orderProduct.getProduct().getImage()))
-                .productName(orderProduct.getProduct().getTitle())
-                .productPrice(orderProduct.getProduct().getPrice())
-                .subTotal((orderProduct.getProduct().getPrice()).multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
+                .productImage((orderProduct.getProduct().getPrimaryImage()))
+                .productName(orderProduct.getProduct().getName())
+                .productPrice(orderProduct.getProduct().getMrp())
+                .subTotal((orderProduct.getProduct().getMrp()).multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
                 .build();
     }
 }

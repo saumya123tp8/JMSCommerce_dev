@@ -1,9 +1,9 @@
 package com.example.JMSCommerce.Controller;
 
 
-import com.example.JMSCommerce.DTOs.ProductCreateDTO;
-import com.example.JMSCommerce.DTOs.ProductResponseDTO;
-import com.example.JMSCommerce.DTOs.ProductResponseDetailsDTO;
+import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
+import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
+import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
@@ -32,7 +32,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
-    private ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
+    private ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(productService.createProduct(productCreateDTO), "Product Created Successfully"));
     }
@@ -61,7 +61,6 @@ public class ProductController {
     @GetMapping("/search")
     @PermitAll
     private ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(@RequestParam("categoryName") Long category_id){
-
         return ResponseEntity.ok(ApiResponse.success(productService.getProductByCategory(category_id), "Product Details Fetched Successfully"));
     }
 

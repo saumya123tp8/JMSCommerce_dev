@@ -70,11 +70,11 @@ public class OrderService {
             for(OrderItemRequestDTO itm : createOrderRequestDTO.getProductsInOrder()){
                 Product product = productMap.get(itm.getProductId());
                 Integer quantity = itm.getQuantity();
-                totalOrderPrice = totalOrderPrice.add(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
+                totalOrderPrice = totalOrderPrice.add(product.getMrp().multiply(BigDecimal.valueOf(quantity)));
                 OrderProduct orderProduct = OrderProduct.builder()
                     .quantity(itm.getQuantity())
                     .product(product)
-                    .currentPrice(product.getPrice())
+                    .currentPrice(product.getMrp())
                     .order(order)
                     .build();
                 listOrderProduct.add(orderProduct);

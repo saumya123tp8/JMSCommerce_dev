@@ -1,4 +1,4 @@
-package com.example.JMSCommerce.DTOs;
+package com.example.JMSCommerce.DTOs.product;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 @SuperBuilder
 public class ProductResponseDTO {
     private Long id;
-    private String title;
+    private String name ;
     private String description;
-    private BigDecimal price;
-    private String image;
-    private int rating;
+    private BigDecimal mrp;
+    private String primaryImage;
+    private Double rating;
 
 }

@@ -2,6 +2,7 @@ package com.example.JMSCommerce.Utility;
 
 import java.text.Normalizer;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 public final class SlugUtil {
 
@@ -19,5 +20,23 @@ public final class SlugUtil {
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("(^-|-$)", "");
     }
+    public static String generateUniqueSlug(
+            String value,
+            Predicate<String> slugExists
+    ) {
+
+        String baseSlug = toSlug(value);
+        String slug = baseSlug;
+
+        int counter = 1;
+
+        while (slugExists.test(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+
+        return slug;
+    }
+
 
 }

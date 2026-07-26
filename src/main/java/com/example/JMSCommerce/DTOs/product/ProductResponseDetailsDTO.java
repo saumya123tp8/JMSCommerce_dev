@@ -1,4 +1,4 @@
-package com.example.JMSCommerce.DTOs;
+package com.example.JMSCommerce.DTOs.product;
 
 import com.example.JMSCommerce.Model.Category;
 import lombok.*;

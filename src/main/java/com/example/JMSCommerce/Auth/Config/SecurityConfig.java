@@ -65,7 +65,7 @@ public class SecurityConfig {
                                 authorizeHttpRequests
                                         .requestMatchers(HttpMethod.GET,"/api/v1/specifications/**").permitAll()
                                         .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET,"/api/v1/product/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET,"/api/v1/products/**").permitAll()
                                         .requestMatchers("/api/v1/reviews/**").permitAll()
                                         .requestMatchers("/api/v1/auth/register").permitAll()
                                         .requestMatchers("/api/v1/auth/login").permitAll()

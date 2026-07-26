@@ -8,8 +8,10 @@ import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,36 +24,45 @@ import java.util.List;
 @RequestMapping("api/v1/products")
 public class ProductController {
 
+
     private final ProductService productService;
+
+//    @PostConstruct
+//    public void init() {
+//        System.out.println("Controller : " + this);
+//        System.out.println("Hash       : " + System.identityHashCode(this));
+//        System.out.println("Service    : " + productService);
+//    }
 
     @GetMapping
     @PermitAll
-    private ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts(){
+    public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts(){
+
         return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts(),"Fetched All Product"));
     }
 
     @PostMapping
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
-    private ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(productService.createProduct(productCreateDTO), "Product Created Successfully"));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
-    private ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id){
         return ResponseEntity.ok(ApiResponse.success(productService.deleteProduct(id),"Product Deleted Successfully"));
     }
 
     @GetMapping("/{id}")
     @PermitAll
-    private ResponseEntity<ApiResponse<ProductResponseDTO>> getProductByID(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductByID(@PathVariable Long id){
         return ResponseEntity.ok(ApiResponse.success(productService.getProductByID(id),"Product with given id"));
     }
 
     @GetMapping("/{id}/details")
     @PermitAll
-    private ResponseEntity<ApiResponse<ProductResponseDetailsDTO>> getProductDetailByID(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<ProductResponseDetailsDTO>> getProductDetailByID(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.findProductDetailById(id), "Product detail with given Id fetched successfully"));
 
     }

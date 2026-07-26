@@ -22,24 +22,21 @@ import java.math.BigDecimal;
 @SQLRestriction("deleted_at is null")
 @Table(name = "product")
 public class Product extends BaseEntity{
-    @NotBlank
+
     private String name;
 
-    @NotBlank
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private CurrencyType currency = CurrencyType.INR;
 
-    @NotNull
     @PositiveOrZero
     private BigDecimal mrp;
 
-    @NotNull
-    @PositiveOrZero
+
     private BigDecimal sellingPrice;
-    @NotBlank
+
     private String primaryImage;
-    @NotBlank
+
     private String slug;
     private String shortDescription;
 
@@ -52,8 +49,8 @@ public class Product extends BaseEntity{
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    @NotNull
-    private Integer availableQuantity;
+    @Builder.Default
+    private Integer availableQuantity = 0;
     @Builder.Default
     private Double rating = 0.0;
     @Builder.Default

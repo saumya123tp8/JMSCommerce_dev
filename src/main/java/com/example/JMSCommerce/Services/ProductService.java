@@ -71,6 +71,8 @@ public class ProductService {
                 productCreateDTO.getCategoryId()
         );
 
+        String normalizedName = productHelper.normalizeName(productCreateDTO.getName());
+        productCreateDTO.setName(normalizedName);
         productHelper.validateDuplicateProductName(
                 productCreateDTO.getName()
         );
@@ -92,14 +94,14 @@ public class ProductService {
         Product product = productAdapter
                 .mapProductCreateDTOToProduct(productCreateDTO);
 
-        String normalizedName = productHelper.normalizeName(productCreateDTO.getName());
-        product.setName(normalizedName);
+//        product.setName(normalizedName);
         product.setCategory(category);
 
         product.setSlug(
                 SlugUtil.generateUniqueSlug(
                         productCreateDTO.getName(),
                         productRepo::existsBySlug
+
                 )
         );
         product = productRepo.save(product);

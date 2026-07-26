@@ -38,6 +38,8 @@ public class ProductAdapter {
                 .mrp(productCreateDTO.getMrp())
                 .primaryImage(productCreateDTO.getPrimaryImage())
                 .description(productCreateDTO.getDescription())
+                .currency(productCreateDTO.getCurrency())
+                .sellingPrice(productCreateDTO.getSellingPrice())
                 .build();
     }
 }

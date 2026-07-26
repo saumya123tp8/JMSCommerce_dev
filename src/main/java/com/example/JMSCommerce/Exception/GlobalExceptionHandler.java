@@ -5,14 +5,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import tools.jackson.databind.exc.InvalidFormatException;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,7 +74,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage(),"Bad Request",null));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ApiResponse<?>> handleValidationException(
             MethodArgumentNotValidException ex) {
 
@@ -104,6 +108,48 @@ public class GlobalExceptionHandler {
                                 request.getRequestURI()
                         )
                 );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex) {
+
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof InvalidFormatException invalidFormatException) {
+
+            if (invalidFormatException.getTargetType().isEnum()) {
+
+                String field =
+                        invalidFormatException.getPath()
+                                .get(0).getPropertyName();
+
+                String invalidValue =
+                        String.valueOf(invalidFormatException.getValue());
+
+                String allowedValues =
+                        Arrays.stream(invalidFormatException.getTargetType().getEnumConstants())
+                                .map(Object::toString)
+                                .collect(Collectors.joining(", "));
+
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.error(
+                                "Invalid Request",
+                                field + " has invalid value '" +
+                                        invalidValue +
+                                        "'. Allowed values: [" +
+                                        allowedValues +
+                                        "]",
+
+                                null
+                        )
+                );
+            }
+        }
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.error("Inavlid Request","Malformed JSON request.", null)
+        );
     }
 
 }

@@ -1,0 +1,4 @@
+package com.example.JMSCommerce.DTOs.specificationDefinition;
+
+public class UpdateSpecificationDefinitionRequestDTO extends CreateSpecificationDefinitionRequestDTO{
+}

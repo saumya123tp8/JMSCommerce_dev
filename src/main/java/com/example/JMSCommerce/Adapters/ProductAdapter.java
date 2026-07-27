@@ -1,9 +1,8 @@
 package com.example.JMSCommerce.Adapters;
 
-import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
-import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
-import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
+import com.example.JMSCommerce.DTOs.product.*;
 import com.example.JMSCommerce.Model.Product;
+import com.example.JMSCommerce.Model.ProductSpecificationValue;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +18,34 @@ public class ProductAdapter {
                 .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
-                .category(entity.getCategory())
+                .currency(entity.getCurrency())
+                .sellingPrice(entity.getSellingPrice())
+                .category(
+                        CategorySummaryDTO.builder()
+                                .id(entity.getCategory().getId())
+                                .name(entity.getCategory().getName())
+                                .description(entity.getCategory().getDescription())
+                                .build()
+                )
+                .brand(
+                        BrandSummaryDTO.builder()
+                                .id(entity.getBrand().getId())
+                                .name(entity.getBrand().getName())
+                                .build()
+                )
                 .build();
     }
     public ProductResponseDTO mapProductToResponseDTO(Product entity){
         return ProductResponseDTO.builder()
                 .name(entity.getName())
-                .description(entity.getDescription())
+                .shortDescription(entity.getShortDescription())
                 .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
+                .brandName(entity.getBrand().getName())
+                .currency(entity.getCurrency())
+                .rating(entity.getRating())
+                .sellingPrice(entity.getSellingPrice())
                 .build();
     }
 
@@ -40,6 +57,31 @@ public class ProductAdapter {
                 .description(productCreateDTO.getDescription())
                 .currency(productCreateDTO.getCurrency())
                 .sellingPrice(productCreateDTO.getSellingPrice())
+                .build();
+    }
+
+
+    public ProductSpecificationResponseDTO
+    mapProductSpecificationValueToResponseDTO(
+            ProductSpecificationValue value
+    ) {
+
+        return ProductSpecificationResponseDTO.builder()
+                .specificationId(
+                        value.getSpecificationDefinition().getId()
+                )
+                .name(
+                        value.getSpecificationDefinition().getName()
+                )
+                .displayName(
+                        value.getSpecificationDefinition().getDisplayName()
+                )
+                .unit(
+                        value.getSpecificationDefinition().getUnit()
+                )
+                .value(
+                        value.getValue()
+                )
                 .build();
     }
 }

@@ -81,10 +81,14 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "user",
+            cascade = CascadeType.ALL,//important should implement for other tooo
+            orphanRemoval = true, //important should implement for other tooo
             fetch = FetchType.LAZY
     )
+    private List<Address> addresses = new ArrayList<>();
 //    @Builder.Default
 //    private List<Address> addresses = new ArrayList<>();
 

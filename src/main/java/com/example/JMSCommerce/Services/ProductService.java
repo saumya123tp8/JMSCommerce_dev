@@ -4,13 +4,12 @@ import com.example.JMSCommerce.Adapters.ProductAdapter;
 import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
+import com.example.JMSCommerce.DTOs.product.ProductSpecificationResponseDTO;
 import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationValueDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
-import com.example.JMSCommerce.Model.Category;
-import com.example.JMSCommerce.Model.Product;
-import com.example.JMSCommerce.Model.ProductSpecificationValue;
-import com.example.JMSCommerce.Model.SpecificationDefinition;
+import com.example.JMSCommerce.Model.*;
+import com.example.JMSCommerce.Repositories.BrandRepo;
 import com.example.JMSCommerce.Repositories.ProductRepo;
 import com.example.JMSCommerce.Repositories.ProductSpecificationRepository;
 import com.example.JMSCommerce.Repositories.SpecificationDefinitionRepository;
@@ -31,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
 
+    private final BrandRepo brandRepo;
     private final ProductRepo productRepo;
     private final CategoryService categoryService;
     private final ProductAdapter productAdapter;
@@ -47,7 +47,7 @@ public class ProductService {
                 .id(product.getId())
                 .mrp(product.getMrp())
                 .rating(product.getRating())
-                .description(product.getDescription())
+                .shortDescription(product.getShortDescription())
                 .primaryImage(product.getPrimaryImage())
                 .build()
         ).collect(Collectors.toList());
@@ -104,70 +104,93 @@ public class ProductService {
 
                 )
         );
+        if(productCreateDTO.getBrandId()!=null){
+            long brandId = productCreateDTO.getBrandId();
+            Brand brand = brandRepo.findById(brandId).orElseThrow(
+              ()-> new ResourceNotFoundException("No such brand exists")
+            );
+            product.setBrand(brand);
+        }
         product = productRepo.save(product);
         if(productCreateDTO.getSpecifications()!=null){
-            //all possible - parent hirarchy
-            List<SpecificationDefinition> allowedSpecifications = productHelper.fetchAllSpecificationsThroughParent(productCreateDTO.getCategoryId());
-            Map<Long, SpecificationDefinition> allowedSpecificationMap =
-                    allowedSpecifications.stream()
-                            .collect(Collectors.toMap(
-                                    SpecificationDefinition::getId,
-                                    Function.identity()
-                            ));
-//            if(allowedSpecificationIds.size()>0){
-                List<Long> submittedSpecificationIds = productCreateDTO.getSpecifications().stream().map(
-                        productSpecificationValueDTO-> productSpecificationValueDTO.getSpecificationId()
-                ).collect(Collectors.toList());
-            Set<Long> uniqueIds = Set.copyOf(submittedSpecificationIds);
-
-            if (uniqueIds.size() != submittedSpecificationIds.size()) {
-                throw new BadRequestException(
-                        "Duplicate specifications submitted."
-                );
-            }
-                List<SpecificationDefinition> specificationDefinitions =
-                        specificationDefinitionRepository.findAllById(submittedSpecificationIds);
-
-            for (Long id : submittedSpecificationIds) {
-
-                SpecificationDefinition definition = allowedSpecificationMap.get(id);
-
-                if (definition == null) {
-                    throw new BadRequestException(
-                            "Specification with id " + id +
-                                    " does not belong to the selected category."
-                    );
-                }
-
-                // Later:
-                // definition.getDataType();
-                // definition.getRequired();
-                // definition.getDisplayName();
-            }
-
-                if(specificationDefinitions.size() != submittedSpecificationIds.size()){
-                    throw new ResourceNotFoundException(
-                            "One or more specifications not found."
-                    );
-                }
-
+//            //all possible - parent hirarchy
+//            List<SpecificationDefinition> allowedSpecifications = productHelper.fetchAllSpecificationsThroughParent(productCreateDTO.getCategoryId());
+//            Map<Long, SpecificationDefinition> allowedSpecificationMap =
+//                    allowedSpecifications.stream()
+//                            .collect(Collectors.toMap(
+//                                    SpecificationDefinition::getId,
+//                                    Function.identity()
+//                            ));
+//
+////            if(allowedSpecificationIds.size()>0){
+//                List<Long> submittedSpecificationIds = productCreateDTO.getSpecifications().stream().map(
+//                        productSpecificationValueDTO-> productSpecificationValueDTO.getSpecificationId()
+//                ).collect(Collectors.toList());
+//            Set<Long> uniqueIds = Set.copyOf(submittedSpecificationIds);
+//            Map<Long,ProductSpecificationValueDTO > mapOfsubmittedSpecification = productCreateDTO.getSpecifications()
+//                    .stream()
+//                    .collect(Collectors.toMap(ProductSpecificationValueDTO::getSpecificationId,Function.identity()));
+//            if (uniqueIds.size() != submittedSpecificationIds.size()) {
+//                throw new BadRequestException(
+//                        "Duplicate specifications submitted."
+//                );
 //            }
+//                List<SpecificationDefinition> specificationDefinitions =
+//                        specificationDefinitionRepository.findAllById(submittedSpecificationIds);
+//
+//            for (Long id : submittedSpecificationIds) {
+//
+//                SpecificationDefinition definition = allowedSpecificationMap.get(id);
+//                System.out.println("definition : " + definition);
+//                if (definition == null) {
+//                    throw new BadRequestException(
+//                            "Can't add specification : " +
+//                                    "" + id + " to chosen category"
+//                    );
+//                }
+//                    productHelper.validateSpecificationValue(
+//                            definition,
+//                            mapOfsubmittedSpecification.get(id)
+//                    );
+//
+//
+//                // Later:
+//                // definition.getDataType();
+//                // definition.getRequired();
+//                // definition.getDisplayName();
 
-            List<ProductSpecificationValue> values = new ArrayList<>();
-            for (ProductSpecificationValueDTO dto : productCreateDTO.getSpecifications()) {
+//
+//            }
+//
+//                if(specificationDefinitions.size() != submittedSpecificationIds.size()){
+//                    throw new ResourceNotFoundException(
+//                            "One or more specifications not found."
+//                    );
+//                }
+//
+////            }
+//
+//            List<ProductSpecificationValue> values = new ArrayList<>();
+//            for (ProductSpecificationValueDTO dto : productCreateDTO.getSpecifications()) {
+//
+//                SpecificationDefinition definition =
+//                        allowedSpecificationMap.get(dto.getSpecificationId());
+//
+//                ProductSpecificationValue value = ProductSpecificationValue.builder()
+//                        .product(product)
+//                        .specificationDefinition(definition)
+//                        .value(dto.getValue())
+//                        .build();
+//
+//                values.add(value);
+//            }
+//            productSpecificationRepository.saveAll(values);
 
-                SpecificationDefinition definition =
-                        allowedSpecificationMap.get(dto.getSpecificationId());
-
-                ProductSpecificationValue value = ProductSpecificationValue.builder()
-                        .product(product)
-                        .specificationDefinition(definition)
-                        .value(dto.getValue())
-                        .build();
-
-                values.add(value);
-            }
-            productSpecificationRepository.saveAll(values);
+            saveProductSpecifications(
+                    product,
+                    category.getId(),
+                    productCreateDTO.getSpecifications()
+            );
         }
 
         return productAdapter.mapProductToResponseDTO(product);
@@ -224,5 +247,188 @@ public class ProductService {
         );
 
         return productResponseDetailsDTO;
+    }
+
+    public List<ProductSpecificationResponseDTO>
+    getProductSpecifications(Long productId) {
+
+        if (!productRepo.existsById(productId)) {
+            throw new ResourceNotFoundException(
+                    "Product with id " + productId + " not found."
+            );
+        }
+
+        return productSpecificationRepository
+                .findByProduct_Id(productId)
+                .stream()
+                .map(productAdapter::mapProductSpecificationValueToResponseDTO)
+                .toList();
+    }
+
+
+    private void saveProductSpecifications(
+            Product product,
+            Long categoryId,
+            List<ProductSpecificationValueDTO> specifications
+    ) {
+
+        if (specifications == null || specifications.isEmpty()) {
+            return;
+        }
+
+        List<SpecificationDefinition> allowedSpecifications =
+                productHelper.fetchAllSpecificationsThroughParent(categoryId);
+
+        Map<Long, SpecificationDefinition> allowedSpecificationMap =
+                allowedSpecifications.stream()
+                        .collect(Collectors.toMap(
+                                SpecificationDefinition::getId,
+                                Function.identity()
+                        ));
+
+        List<Long> submittedSpecificationIds = specifications.stream()
+                .map(ProductSpecificationValueDTO::getSpecificationId)
+                .toList();
+
+        Set<Long> uniqueIds = Set.copyOf(submittedSpecificationIds);
+
+        if (uniqueIds.size() != submittedSpecificationIds.size()) {
+            throw new BadRequestException(
+                    "Duplicate specifications submitted."
+            );
+        }
+
+        Map<Long, ProductSpecificationValueDTO> submittedMap =
+                specifications.stream()
+                        .collect(Collectors.toMap(
+                                ProductSpecificationValueDTO::getSpecificationId,
+                                Function.identity()
+                        ));
+
+        List<SpecificationDefinition> definitions =
+                specificationDefinitionRepository.findAllById(submittedSpecificationIds);
+
+        if (definitions.size() != submittedSpecificationIds.size()) {
+            throw new ResourceNotFoundException(
+                    "One or more specifications not found."
+            );
+        }
+
+        for (Long id : submittedSpecificationIds) {
+
+            SpecificationDefinition definition =
+                    allowedSpecificationMap.get(id);
+
+            if (definition == null) {
+                throw new BadRequestException(
+                        "Can't add specification " + id +
+                                " to selected category."
+                );
+            }
+
+            productHelper.validateSpecificationValue(
+                    definition,
+                    submittedMap.get(id)
+            );
+        }
+
+        List<ProductSpecificationValue> values = specifications.stream()
+                .map(dto -> ProductSpecificationValue.builder()
+                        .product(product)
+                        .specificationDefinition(
+                                allowedSpecificationMap.get(dto.getSpecificationId())
+                        )
+                        .value(dto.getValue())
+                        .build())
+                .toList();
+
+        productSpecificationRepository.saveAll(values);
+    }
+
+
+    private Product getProductById ( Long id){
+        Product product = productRepo.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Product with given Id not found")
+                );
+        return product;
+    }
+
+    @Transactional
+    public ProductResponseDTO updateProduct(
+            Long id,
+            ProductCreateDTO request
+    ) {
+
+        Product product = getProductById(id);
+
+        Category category =
+                categoryService.getCategoryById(
+                        request.getCategoryId()
+                );
+
+        String normalizedName =
+                productHelper.normalizeName(request.getName());
+
+        request.setName(normalizedName);
+
+        productHelper.validateDuplicateProductName(
+                request.getName()
+        );
+
+        productHelper.validateSellingPrice(
+                request.getMrp(),
+                request.getSellingPrice()
+        );
+
+        productHelper.validateSku(
+                request.getSku()
+        );
+
+        productHelper.validateBarcode(
+                request.getBarcode()
+        );
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setShortDescription(request.getShortDescription());
+        product.setCurrency(request.getCurrency());
+        product.setMrp(request.getMrp());
+        product.setSellingPrice(request.getSellingPrice());
+        product.setPrimaryImage(request.getPrimaryImage());
+        product.setAvailableQuantity(request.getAvailableQuantity());
+        product.setSku(request.getSku());
+        product.setBarcode(request.getBarcode());
+
+        product.setCategory(category);
+
+        if (request.getBrandId() != null) {
+
+            Brand brand = brandRepo.findById(request.getBrandId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Brand not found."
+                            ));
+
+            product.setBrand(brand);
+
+        } else {
+
+            product.setBrand(null);
+        }
+
+        productSpecificationRepository.deleteAll(
+                productSpecificationRepository.findByProduct_Id(id)
+        );
+
+        saveProductSpecifications(
+                product,
+                category.getId(),
+                request.getSpecifications()
+        );
+
+        product = productRepo.save(product);
+
+        return productAdapter.mapProductToResponseDTO(product);
     }
 }

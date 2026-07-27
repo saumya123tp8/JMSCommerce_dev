@@ -1,5 +1,6 @@
 package com.example.JMSCommerce.Utility;
 
+import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationValueDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.Category;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,4 +118,51 @@ public class ProductHelper {
         return new ArrayList<>(specifications.values());
     }
 
+    public void validateSpecificationValue(SpecificationDefinition definition, ProductSpecificationValueDTO productSpecificationValueDTO) {
+
+        System.out.println(" def "+definition+" DTO "+productSpecificationValueDTO);
+        String value = productSpecificationValueDTO.getValue();
+        switch (definition.getDataType()) {
+
+            case TEXT:
+                if (value == null || value.isBlank()) {
+                    throw new BadRequestException(
+                            definition.getDisplayName() + " cannot be blank."
+                    );
+                }
+                break;
+
+            case NUMBER:
+                try {
+                    Double.parseDouble(value);
+                } catch (NumberFormatException ex) {
+                    throw new BadRequestException(
+                            definition.getDisplayName() + " must be a valid number."
+                    );
+                }
+                break;
+
+            case BOOLEAN:
+                if (!value.equalsIgnoreCase("true")
+                        && !value.equalsIgnoreCase("false")) {
+
+                    throw new BadRequestException(
+                            definition.getDisplayName() + " must be true or false."
+                    );
+                }
+                break;
+
+            case DATE:
+                try {
+                    LocalDate.parse(value);
+                } catch (DateTimeParseException ex) {
+                    throw new BadRequestException(
+                            definition.getDisplayName()
+                                    + " must be in yyyy-MM-dd format."
+                    );
+                }
+                break;
+        }
+
+    }
 }

@@ -200,10 +200,12 @@ public class OrderService {
     }
 
     public GetOrderResponseDTO updateOrderByOrderIdCurrUser(Long id, UpdateOrderReqDTO updateOrderReqDTO) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
+//        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        String currUserMail = SecurityUtils.getCurrentUserMail();
 
         Order order = orderRepo
-                .findByIdAndUser_Id(id, currentUserId)
+                .findByIdAndUser_email(id, currUserMail)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         return CommonMethodToUpdateOrder(updateOrderReqDTO, order);
@@ -229,19 +231,18 @@ public class OrderService {
 
     // this will check order and return only if order is related to the current authenticated user
     public GetOrderResponseDTO getOrderByOrderIdCurrUser(Long orderId) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
+        String currentUserMail = SecurityUtils.getCurrentUserMail();
         Order order = orderRepo
-                .findByIdAndUser_Id(orderId, currentUserId)
+                .findByIdAndUser_email(orderId, currentUserMail)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         return orderAdapter.mapToGetOrderResponseDTO(order);
     }
 
     public Void deleteOrderByOrderIdCurrUser(Long id) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
+        String currentUserMail = SecurityUtils.getCurrentUserMail();
         Order order = orderRepo
-                .findByIdAndUser_Id(id, currentUserId)
+                .findByIdAndUser_email(id, currentUserMail)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         orderRepo.delete(order);

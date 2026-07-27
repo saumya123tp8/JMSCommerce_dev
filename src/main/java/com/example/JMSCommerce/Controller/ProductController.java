@@ -4,6 +4,7 @@ package com.example.JMSCommerce.Controller;
 import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
+import com.example.JMSCommerce.DTOs.product.ProductSpecificationResponseDTO;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
@@ -73,6 +74,26 @@ public class ProductController {
     @PermitAll
     private ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(@RequestParam("categoryName") Long category_id){
         return ResponseEntity.ok(ApiResponse.success(productService.getProductByCategory(category_id), "Product Details Fetched Successfully"));
+    }
+
+    @GetMapping("/{id}/specifications")
+    @PermitAll
+    public ResponseEntity<ApiResponse<List<ProductSpecificationResponseDTO>>>
+    getSpecifications(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        productService.getProductSpecifications(id),"List Of Specified Sepcification for the selected product"
+                )
+        );
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> updateProduct(@PathVariable Long id,@RequestBody ProductCreateDTO productCreateDTO){
+        return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id,productCreateDTO),"Product Updated Successfully"));
     }
 
 }

@@ -17,4 +17,6 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
   List<Order> findAllByUser_Id(Long userId);
 
   List<Order> findAllByStatus(OrderStatus status);
+
+    Optional<Order> findByIdAndUser_email(Long id, String currUserMail);
 }

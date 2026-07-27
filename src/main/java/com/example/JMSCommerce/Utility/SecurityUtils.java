@@ -8,13 +8,22 @@ public final class SecurityUtils {
 
     private SecurityUtils() {}
 
-    public static Long getCurrentUserId() {
+//    public static Long getCurrentUserId() {
+//        Authentication authentication =
+//                SecurityContextHolder.getContext().getAuthentication();
+//
+//        User user =
+//                (User) authentication.getPrincipal();
+//
+//        return user.getId();
+//    }
+
+    public static String getCurrentUserMail() {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
-
-        User user =
-                (User) authentication.getPrincipal();
-
-        return user.getId();
+        System.out.println("authentication "+authentication);
+        String email = authentication.getPrincipal().toString();
+        return email;
     }
 }

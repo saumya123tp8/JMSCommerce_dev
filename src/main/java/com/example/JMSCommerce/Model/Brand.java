@@ -3,6 +3,8 @@ package com.example.JMSCommerce.Model;
 import jakarta.persistence.Entity;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Builder
 @Getter
@@ -10,5 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Brand extends BaseEntity{
-    private String brandName;
+    private String name;
+    private Date stablishDate;
 }

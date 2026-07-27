@@ -24,7 +24,7 @@ public class Address extends BaseEntity {
     @Column(nullable = false, length = 15)
     private String receiverPhone;
 
-    @Column(length = 10)
+    @Column(length = 5)
     private String countryCode;
 
     @Column(nullable = false, length = 100)

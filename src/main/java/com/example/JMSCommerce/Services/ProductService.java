@@ -45,7 +45,7 @@ public class ProductService {
         List<ProductResponseDTO> listProducts = products.stream().map(product -> ProductResponseDTO.builder()
                 .name(product.getName())
                 .id(product.getId())
-                .mrp(product.getMrp())
+//                .mrp(product.getMrp())
                 .rating(product.getRating())
                 .shortDescription(product.getShortDescription())
                 .primaryImage(product.getPrimaryImage())
@@ -393,12 +393,12 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setShortDescription(request.getShortDescription());
         product.setCurrency(request.getCurrency());
-        product.setMrp(request.getMrp());
-        product.setSellingPrice(request.getSellingPrice());
+//        product.setMrp(request.getMrp());
+//        product.setSellingPrice(request.getSellingPrice());
         product.setPrimaryImage(request.getPrimaryImage());
-        product.setAvailableQuantity(request.getAvailableQuantity());
-        product.setSku(request.getSku());
-        product.setBarcode(request.getBarcode());
+//        product.setAvailableQuantity(request.getAvailableQuantity());
+//        product.setSku(request.getSku());
+//        product.setBarcode(request.getBarcode());
 
         product.setCategory(category);
 

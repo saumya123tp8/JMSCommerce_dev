@@ -32,15 +32,15 @@ public class ProductCreateDTO {
             inclusive = true,
             message = "MRP must be greater than or equal to 0."
     )
-    private BigDecimal mrp;
-
-    @NotNull(message = "Selling price is required.")
-    @DecimalMin(
-            value = "0.0",
-            inclusive = true,
-            message = "Selling price must be greater than or equal to 0."
-    )
-    private BigDecimal sellingPrice;
+//    private BigDecimal mrp;
+//
+//    @NotNull(message = "Selling price is required.")
+//    @DecimalMin(
+//            value = "0.0",
+//            inclusive = true,
+//            message = "Selling price must be greater than or equal to 0."
+//    )
+//    private BigDecimal sellingPrice;
 
     @NotBlank(message = "Primary image is required.")
     @Size(max = 500)
@@ -62,13 +62,13 @@ public class ProductCreateDTO {
             value = 0,
             message = "Available quantity cannot be negative."
     )
-    private Integer availableQuantity;
+//    private Integer availableQuantity;
 
-    @Size(max = 100)
-    private String sku;
-
-    @Size(max = 100)
-    private String barcode;
+//    @Size(max = 100)
+//    private String sku;
+//
+//    @Size(max = 100)
+//    private String barcode;
 
     private List<ProductSpecificationValueDTO> specifications;
 }

@@ -1,16 +1,15 @@
 package com.example.JMSCommerce.Model;
 
 import com.example.JMSCommerce.Utility.enums.CurrencyType;
+import com.example.JMSCommerce.Utility.enums.InventoryType;
 import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,11 +28,11 @@ public class Product extends BaseEntity{
     @Builder.Default
     private CurrencyType currency = CurrencyType.INR;
 
-    @PositiveOrZero
-    private BigDecimal mrp;
-
-
-    private BigDecimal sellingPrice;
+//    @PositiveOrZero
+//    private BigDecimal mrp;
+//
+//
+//    private BigDecimal sellingPrice;
 
     private String primaryImage;
 
@@ -49,8 +48,13 @@ public class Product extends BaseEntity{
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    @Builder.Default
-    private Integer availableQuantity = 0;
+//    @Builder.Default
+//    private Integer availableQuantity = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private InventoryType inventoryType = InventoryType.FINITE;
+
     @Builder.Default
     private Double rating = 0.0;
     @Builder.Default
@@ -67,7 +71,14 @@ public class Product extends BaseEntity{
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    private String sku;
-    private String barcode;
+//    private String sku;
+//    private String barcode;
+@OneToMany(
+        mappedBy = "product",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+)
+@Builder.Default
+private List<ProductVariant> variants = new ArrayList<>();
 
 }

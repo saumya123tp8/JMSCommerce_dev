@@ -14,7 +14,7 @@ public class ProductResponseDetailsDTO extends ProductResponseDTO{
     private CategorySummaryDTO category;
     private BrandSummaryDTO brand;
     private String description;
-    private Integer availableQuantity;
+//    private Integer availableQuantity;
     private Integer ratingCount ;
     private Integer reviewCount ;
 }

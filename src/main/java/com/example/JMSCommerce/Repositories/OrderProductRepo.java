@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderProductRepo extends JpaRepository<OrderProduct,Long> {
@@ -17,4 +18,9 @@ public interface OrderProductRepo extends JpaRepository<OrderProduct,Long> {
 
     @Query("SELECT op FROM OrderProduct op JOIN FETCH op.product WHERE op.order = :order")
     Collection<OrderProduct> findByOrderWithProduct(Order order);
+
+    @Override
+    Optional<OrderProduct> findById(Long aLong);
+
+    Optional<OrderProduct> findByIdAndOrderId(Long orderProductId, Long orderId);
 }

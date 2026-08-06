@@ -71,7 +71,37 @@ public class CustomizationServiceImpl
     }
 
     @Override
-    public CustomizationResponseDTO updateCustomizations(Long productId, CreateCustomizationRequestDTO request) {
-        return null;
+    public CustomizationResponseDTO updateCustomizations(
+            Long productId,
+            CreateCustomizationRequestDTO request
+    ) {
+
+        // 1. Validate request
+        customizationValidator.validate(request);
+
+        // 2. Load Product
+        Product product = productHelper.getProductOrThrow(
+                productRepository,
+                productId
+        );
+
+        // 3. Remove existing customization groups
+        product.getCustomizationGroups().clear();
+
+        // 4. Convert request to entities
+        List<CustomizationGroup> groups =
+                customizationAdapter.toEntities(request);
+
+        // 5. Attach new groups
+        groups.forEach(product::addCustomizationGroup);
+
+        // 6. Save
+        Product savedProduct =
+                productRepository.save(product);
+
+        // 7. Return response
+        return customizationAdapter.toCustomizationResponse(
+                savedProduct
+        );
     }
 }

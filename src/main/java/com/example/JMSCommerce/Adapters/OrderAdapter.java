@@ -51,8 +51,8 @@ public class OrderAdapter {
                 .quantity(orderProduct.getQuantity())
                 .productImage((orderProduct.getProduct().getPrimaryImage()))
                 .productName(orderProduct.getProduct().getName())
-                .productPrice(orderProduct.getProduct().getMrp())
-                .subTotal((orderProduct.getProduct().getMrp()).multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
+//                .productPrice(orderProduct.getProduct().getMrp())
+//                .subTotal((orderProduct.getProduct().getMrp()).multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
                 .build();
     }
 }

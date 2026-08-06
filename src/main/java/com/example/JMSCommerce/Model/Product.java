@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,8 @@ public class Product extends BaseEntity{
 //    private BigDecimal mrp;
 //
 //
-//    private BigDecimal sellingPrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal mrp;
 
     private String primaryImage;
 
@@ -53,6 +55,7 @@ public class Product extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private InventoryType inventoryType = InventoryType.FINITE;
 
     @Builder.Default
@@ -80,5 +83,43 @@ public class Product extends BaseEntity{
 )
 @Builder.Default
 private List<ProductVariant> variants = new ArrayList<>();
+    public void addVariant(ProductVariant variant) {
+
+        if (!variants.contains(variant)) {
+            variants.add(variant);
+        }
+
+        variant.setProduct(this);
+
+    }
+
+    public void removeVariant(ProductVariant variant) {
+
+        variants.remove(variant);
+        variant.setProduct(null);
+
+    }
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<CustomizationGroup> customizationGroups = new ArrayList<>();
+
+    public void addCustomizationGroup(CustomizationGroup group) {
+
+        customizationGroups.add(group);
+        group.setProduct(this);
+
+    }
+
+    public void removeCustomizationGroup(CustomizationGroup group) {
+
+        customizationGroups.remove(group);
+        group.setProduct(null);
+
+    }
 
 }

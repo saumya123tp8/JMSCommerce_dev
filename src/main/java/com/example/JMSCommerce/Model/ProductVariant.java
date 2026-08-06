@@ -33,6 +33,22 @@ public class ProductVariant extends BaseEntity {
     @Builder.Default
     private List<VariantAttribute> attributes = new ArrayList<>();
 
+    public void addAttribute(VariantAttribute attribute) {
+
+        if (!attributes.contains(attribute)) {
+            attributes.add(attribute);
+        }
+
+        attribute.setVariant(this);
+
+    }
+
+    public void removeAttribute(VariantAttribute attribute) {
+
+        attributes.remove(attribute);
+        attribute.setVariant(null);
+
+    }
     /**
      * Examples:
      * Default

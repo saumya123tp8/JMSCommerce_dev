@@ -15,9 +15,11 @@ import com.example.JMSCommerce.Repositories.ProductSpecificationRepository;
 import com.example.JMSCommerce.Repositories.SpecificationDefinitionRepository;
 import com.example.JMSCommerce.Utility.ProductHelper;
 import com.example.JMSCommerce.Utility.SlugUtil;
+import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +44,14 @@ public class ProductService {
 //    }
     public List<ProductResponseDTO> getAllProducts() {
         List<Product> products = productRepo.findAll();
-        List<ProductResponseDTO> listProducts = products.stream().map(product -> ProductResponseDTO.builder()
-                .name(product.getName())
-                .id(product.getId())
-//                .mrp(product.getMrp())
-                .rating(product.getRating())
-                .shortDescription(product.getShortDescription())
-                .primaryImage(product.getPrimaryImage())
-                .build()
+        List<ProductResponseDTO> listProducts = products.stream().map(product->productAdapter.mapProductToResponseDTO(product)
+        ).collect(Collectors.toList());
+        return listProducts;
+    }
+
+    public List<ProductResponseDTO> getAllProductsByStatus( ProductStatus status) {
+        List<Product> products = productRepo.findAllByStatus(status);
+        List<ProductResponseDTO> listProducts = products.stream().map(product->productAdapter.mapProductToResponseDTO(product)
         ).collect(Collectors.toList());
         return listProducts;
     }
@@ -77,18 +79,18 @@ public class ProductService {
                 productCreateDTO.getName()
         );
 
-        productHelper.validateSellingPrice(
-                productCreateDTO.getMrp(),
-                productCreateDTO.getSellingPrice()
-        );
+//        productHelper.validateSellingPrice(
+//                productCreateDTO.getMrp(),
+//                productCreateDTO.getSellingPrice()
+//        );
 
-        productHelper.validateSku(
-                productCreateDTO.getSku()
-        );
+//        productHelper.validateSku(
+//                productCreateDTO.getSku()
+//        );
 
-        productHelper.validateBarcode(
-                productCreateDTO.getBarcode()
-        );
+//        productHelper.validateBarcode(
+//                productCreateDTO.getBarcode()
+//        );
 
 
         Product product = productAdapter
@@ -111,6 +113,7 @@ public class ProductService {
             );
             product.setBrand(brand);
         }
+        product.setStatus(ProductStatus.DRAFT);//initilly set product as draft
         product = productRepo.save(product);
         if(productCreateDTO.getSpecifications()!=null){
 //            //all possible - parent hirarchy
@@ -376,18 +379,18 @@ public class ProductService {
                 request.getName()
         );
 
-        productHelper.validateSellingPrice(
-                request.getMrp(),
-                request.getSellingPrice()
-        );
+//        productHelper.validateSellingPrice(
+//                request.getMrp(),
+//                request.getSellingPrice()
+//        );
 
-        productHelper.validateSku(
-                request.getSku()
-        );
+//        productHelper.validateSku(
+//                request.getSku()
+//        );
 
-        productHelper.validateBarcode(
-                request.getBarcode()
-        );
+//        productHelper.validateBarcode(
+//                request.getBarcode()
+//        );
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());

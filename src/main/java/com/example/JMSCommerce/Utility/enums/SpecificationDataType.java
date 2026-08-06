@@ -6,5 +6,6 @@ public enum SpecificationDataType {
     BOOLEAN,
     DATE,
     COLOR,
+    DECIMAL,
 
 }

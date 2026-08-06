@@ -20,6 +20,9 @@ public class BrandAdapter {
         return BrandSummaryDTO.builder()
                 .id(brand.getId())
                 .name(brand.getName())
+                .stablishDate(brand.getStablishDate())
+                .logo(brand.getLogo())
+                .description(brand.getDescription())
                 .build();
     }
 }

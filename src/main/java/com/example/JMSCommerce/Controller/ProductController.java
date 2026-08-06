@@ -9,8 +9,10 @@ import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
+import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -42,11 +45,18 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts(),"Fetched All Product"));
     }
 
+    @GetMapping("/by_status")
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProductsByStatus(@RequestBody ProductStatus status){
+
+        return ResponseEntity.ok(ApiResponse.success(productService.getAllProductsByStatus(status),"Fetched All " + status + " Product"));
+    }
+
     @PostMapping
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductCreateDTO productCreateDTO){
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(productService.createProduct(productCreateDTO), "Product Created Successfully"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(productService.createProduct(productCreateDTO), "Product Created Successfully as Draft, add Variant to continue listing "));
     }
 
     @DeleteMapping("/{id}")

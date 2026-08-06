@@ -4,11 +4,11 @@ import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationVal
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.Category;
+import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Model.SpecificationDefinition;
 import com.example.JMSCommerce.Repositories.CategoryRepo;
 import com.example.JMSCommerce.Repositories.ProductRepo;
 import com.example.JMSCommerce.Repositories.SpecificationDefinitionRepository;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +27,23 @@ public class ProductHelper {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepository;
     private final SpecificationDefinitionRepository specificationDefinitionRepository;
+
+    public Product getActiveProductOrThrow(ProductRepo productRepository, Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id : " + productId
+                        )
+                );
+    }
+    public Product getProductOrThrow(ProductRepo productRepository, Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id : " + productId
+                        )
+                );
+    }
 
     public void validateSellingPrice(
             BigDecimal mrp,
@@ -52,33 +69,33 @@ public class ProductHelper {
         }
     }
 
-    public void validateSku(
-            String sku
-    ) {
+    //    public void validateSku(
+//            String sku
+//    ) {
+//
+//        if (sku != null &&
+//                !sku.isBlank() &&
+//                productRepo.existsBySkuIgnoreCase(sku.trim())) {
+//
+//            throw new BadRequestException(
+//                    "SKU already exists."
+//            );
+//        }
+//    }
 
-        if (sku != null &&
-                !sku.isBlank() &&
-                productRepo.existsBySkuIgnoreCase(sku.trim())) {
-
-            throw new BadRequestException(
-                    "SKU already exists."
-            );
-        }
-    }
-
-    public void validateBarcode(
-            String barcode
-    ) {
-
-        if (barcode != null &&
-                !barcode.isBlank() &&
-                productRepo.existsByBarcode(barcode.trim())) {
-
-            throw new BadRequestException(
-                    "Barcode already exists."
-            );
-        }
-    }
+//    public void validateBarcode(
+//            String barcode
+//    ) {
+//
+//        if (barcode != null &&
+//                !barcode.isBlank() &&
+//                productRepo.existsByBarcode(barcode.trim())) {
+//
+//            throw new BadRequestException(
+//                    "Barcode already exists."
+//            );
+//        }
+//    }
     public String normalizeName(String name){
 
         return name.trim()

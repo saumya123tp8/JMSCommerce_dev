@@ -14,4 +14,6 @@ import java.util.Date;
 public class Brand extends BaseEntity{
     private String name;
     private Date stablishDate;
+    private String description;
+    private String logo;
 }

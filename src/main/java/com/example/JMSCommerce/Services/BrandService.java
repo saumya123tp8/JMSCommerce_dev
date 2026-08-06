@@ -4,8 +4,10 @@ import com.example.JMSCommerce.Adapters.BrandAdapter;
 import com.example.JMSCommerce.DTOs.product.BrandReqDTO;
 import com.example.JMSCommerce.DTOs.product.BrandSummaryDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
+import com.example.JMSCommerce.Exception.ResourceDeletionException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.Brand;
+import com.example.JMSCommerce.Model.Category;
 import com.example.JMSCommerce.Repositories.BrandRepo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -82,5 +84,20 @@ public class BrandService {
                         new ResourceNotFoundException(
                                 "Brand with id " + id + " not found."
                         ));
+    }
+
+    public void deleteBrand(Long id) {
+        Brand brand = brandRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "Brand not found"
+                )
+        );
+
+        throw new ResourceDeletionException(
+                "Can not delete brand [ currently this feature is under consideration ]"
+        );
+
+//        categoryRepo.delete(category);
+//        log.info("Category with id {} deleted successfully", id);
     }
 }

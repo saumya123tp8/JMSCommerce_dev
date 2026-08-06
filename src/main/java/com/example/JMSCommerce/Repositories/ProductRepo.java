@@ -42,9 +42,12 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
 
     boolean existsByNameIgnoreCase(String trim);
 
-    boolean existsBySkuIgnoreCase(String trim);
+//    boolean existsBySkuIgnoreCase(String trim);
 
-    boolean existsByBarcode(String trim);
+//    boolean existsByBarcode(String trim);
 
     boolean existsBySlug(String s);
+
+    @Query( "SELECT p from Product p where p.status = :status ")
+    List<Product> findAllByStatus(ProductStatus status);
 }

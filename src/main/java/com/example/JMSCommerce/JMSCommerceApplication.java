@@ -11,46 +11,46 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing
-public class JMSCommerceApplication implements CommandLineRunner {
-
-	@Autowired
-	private RoleRepository roleRepository;
+//public class JMSCommerceApplication implements CommandLineRunner {
+public class JMSCommerceApplication{
+//	@Autowired
+//	private RoleRepository roleRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(JMSCommerceApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-//we will create some default user just after the start of the applicatio
-		//ADMIN
-		//GUEST
-
-		roleRepository.findByName("ROLE_"+ AppConstants.ADMIN_ROLE).ifPresentOrElse(role->{
-
-		},()->{
-			Role role = Role.builder()
-					.name("ROLE_"+AppConstants.ADMIN_ROLE)
-					.build();
-			roleRepository.save(role);
-		});
-
-		roleRepository.findByName("ROLE_"+AppConstants.GUEST_ROLE).ifPresentOrElse(role->{
-
-		},()->{
-			Role role = Role.builder()
-					.name("ROLE_"+AppConstants.GUEST_ROLE)
-					.build();
-			roleRepository.save(role);
-		});
-
-		roleRepository.findByName("ROLE_"+AppConstants.DEVELOPER_ROLE).ifPresentOrElse(role->{
-
-		},()->{
-			Role role = Role.builder()
-					.name("ROLE_"+AppConstants.DEVELOPER_ROLE)
-					.build();
-			roleRepository.save(role);
-		});
-	}
+//	@Override
+//	public void run(String... args) throws Exception {
+////we will create some default user just after the start of the applicatio
+//		//ADMIN
+//		//GUEST
+//
+//		roleRepository.findByName("ROLE_"+ AppConstants.ADMIN_ROLE).ifPresentOrElse(role->{
+//
+//		},()->{
+//			Role role = Role.builder()
+//					.name("ROLE_"+AppConstants.ADMIN_ROLE)
+//					.build();
+//			roleRepository.save(role);
+//		});
+//
+//		roleRepository.findByName("ROLE_"+AppConstants.GUEST_ROLE).ifPresentOrElse(role->{
+//
+//		},()->{
+//			Role role = Role.builder()
+//					.name("ROLE_"+AppConstants.GUEST_ROLE)
+//					.build();
+//			roleRepository.save(role);
+//		});
+//
+//		roleRepository.findByName("ROLE_"+AppConstants.DEVELOPER_ROLE).ifPresentOrElse(role->{
+//
+//		},()->{
+//			Role role = Role.builder()
+//					.name("ROLE_"+AppConstants.DEVELOPER_ROLE)
+//					.build();
+//			roleRepository.save(role);
+//		});
+//	}
 }

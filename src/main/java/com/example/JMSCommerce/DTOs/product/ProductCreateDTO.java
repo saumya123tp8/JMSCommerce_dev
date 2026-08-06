@@ -2,6 +2,7 @@ package com.example.JMSCommerce.DTOs.product;
 
 import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationValueDTO;
 import com.example.JMSCommerce.Utility.enums.CurrencyType;
+import com.example.JMSCommerce.Utility.enums.InventoryType;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -26,12 +27,12 @@ public class ProductCreateDTO {
     @NotNull(message = "Currency is required.")
     private CurrencyType currency;
 
-    @NotNull(message = "MRP is required.")
-    @DecimalMin(
-            value = "0.0",
-            inclusive = true,
-            message = "MRP must be greater than or equal to 0."
-    )
+//    @NotNull(message = "MRP is required.")
+//    @DecimalMin(
+//            value = "0.0",
+//            inclusive = true,
+//            message = "MRP must be greater than or equal to 0."
+//    )
 //    private BigDecimal mrp;
 //
 //    @NotNull(message = "Selling price is required.")
@@ -57,11 +58,11 @@ public class ProductCreateDTO {
 
     private Long brandId;
 
-    @NotNull(message = "Available quantity is required.")
-    @Min(
-            value = 0,
-            message = "Available quantity cannot be negative."
-    )
+//    @NotNull(message = "Available quantity is required.")
+//    @Min(
+//            value = 0,
+//            message = "Available quantity cannot be negative."
+//    )
 //    private Integer availableQuantity;
 
 //    @Size(max = 100)
@@ -71,4 +72,6 @@ public class ProductCreateDTO {
 //    private String barcode;
 
     private List<ProductSpecificationValueDTO> specifications;
+
+    private InventoryType inventoryType = InventoryType.FINITE;
 }

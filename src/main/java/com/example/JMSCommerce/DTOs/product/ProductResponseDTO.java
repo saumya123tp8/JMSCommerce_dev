@@ -1,6 +1,8 @@
 package com.example.JMSCommerce.DTOs.product;
 
 import com.example.JMSCommerce.Utility.enums.CurrencyType;
+import com.example.JMSCommerce.Utility.enums.InventoryType;
+import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -21,4 +23,6 @@ public class ProductResponseDTO {
     private CurrencyType currency;
     private BigDecimal sellingPrice;
     private String shortDescription;
+    private ProductStatus status;
+    private InventoryType inventoryType;
 }

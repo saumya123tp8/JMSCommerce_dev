@@ -5,6 +5,7 @@ import com.example.JMSCommerce.DTOs.CategoryResponseDTO;
 import com.example.JMSCommerce.DTOs.CreateCategoryRequestDTO;
 import com.example.JMSCommerce.DTOs.UpdateCategoryRequestDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
+import com.example.JMSCommerce.Exception.ResourceDeletionException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.Category;
 import com.example.JMSCommerce.Repositories.CategoryRepo;
@@ -149,15 +150,20 @@ public class CategoryService {
     }
 
 
-//    public void deleteCategory(Long id) {
-//        Category category = categoryRepo.findById(id).orElseThrow(
-//                () -> new ResourceNotFoundException(
-//                        "Category not found"
-//                )
-//        );
+    public void deleteCategory(Long id) {
+        Category category = categoryRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "Category not found"
+                )
+        );
+
+            throw new ResourceDeletionException(
+                    "Can not delete categories [ prefer update - INACTIVE ]"
+            );
+
 //        categoryRepo.delete(category);
 //        log.info("Category with id {} deleted successfully", id);
-//    }
+    }
 
     @Transactional
     public void updateStatus(Long id, CategoryStatus status) {

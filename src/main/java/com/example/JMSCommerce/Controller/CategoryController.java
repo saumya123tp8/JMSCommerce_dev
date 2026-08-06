@@ -60,11 +60,11 @@ public class CategoryController {
                 )
         );
     }
-//    @DeleteMapping("/{id}")
-//    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
-//    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id){
-//        categoryService.deleteCategory(id);
-//        return ResponseEntity.ok().body(ApiResponse.success(null,"Category deleted successfully"));
-//    }
+    @DeleteMapping("/{id}")
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id){
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok().body(ApiResponse.success(null,"Category deleted successfully"));
+    }
 
 }

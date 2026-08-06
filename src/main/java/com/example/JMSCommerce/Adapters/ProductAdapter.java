@@ -15,11 +15,11 @@ public class ProductAdapter {
         return ProductResponseDetailsDTO.builder()
                 .name(entity.getName())
                 .description(entity.getDescription())
-                .mrp(entity.getMrp())
+//                .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
                 .currency(entity.getCurrency())
-                .sellingPrice(entity.getSellingPrice())
+//                .sellingPrice(entity.getSellingPrice())
                 .category(
                         CategorySummaryDTO.builder()
                                 .id(entity.getCategory().getId())
@@ -39,24 +39,30 @@ public class ProductAdapter {
         return ProductResponseDTO.builder()
                 .name(entity.getName())
                 .shortDescription(entity.getShortDescription())
-                .mrp(entity.getMrp())
+//                .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
-                .brandName(entity.getBrand().getName())
+                .brandName(entity.getBrand()!=null?entity.getBrand().getName():"")
                 .currency(entity.getCurrency())
                 .rating(entity.getRating())
-                .sellingPrice(entity.getSellingPrice())
+//                .sellingPrice(entity.getSellingPrice())
+                .status(entity.getStatus())
+                .currency(entity.getCurrency())
+                .inventoryType(entity.getInventoryType())
+                .id(entity.getId())
                 .build();
     }
 
     public Product mapProductCreateDTOToProduct(ProductCreateDTO productCreateDTO){
         return  Product.builder()
                 .name(productCreateDTO.getName())
-                .mrp(productCreateDTO.getMrp())
+//                .mrp(productCreateDTO.getMrp())
                 .primaryImage(productCreateDTO.getPrimaryImage())
                 .description(productCreateDTO.getDescription())
                 .currency(productCreateDTO.getCurrency())
-                .sellingPrice(productCreateDTO.getSellingPrice())
+                .shortDescription(productCreateDTO.getShortDescription())
+                .inventoryType(productCreateDTO.getInventoryType())
+//                .sellingPrice(productCreateDTO.getSellingPrice())
                 .build();
     }
 

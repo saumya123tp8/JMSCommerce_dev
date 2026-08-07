@@ -10,13 +10,13 @@ import java.util.Optional;
 public interface ReviewRepository
         extends JpaRepository<Review, Long> {
 
-    Optional<Review> findByOrderProductId(
+    Optional<Review> findByOrderProduct_Id(
             Long orderProductId
     );
 
 
 
-    List<Review> findByOrderProductProductIdAndStatus(
+    List<Review> findByOrderProduct_Product_IdAndStatus(
             Long productId,
             ReviewStatus status
     );

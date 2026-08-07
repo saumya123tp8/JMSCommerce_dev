@@ -44,7 +44,7 @@ public class CustomizationServiceImpl
             );
         }
 
-        customizationValidator.validate(request);
+        customizationValidator.validateDefinition(request);
 
         List<CustomizationGroup> groups =
                 customizationAdapter.toEntities(request);
@@ -77,7 +77,7 @@ public class CustomizationServiceImpl
     ) {
 
         // 1. Validate request
-        customizationValidator.validate(request);
+        customizationValidator.validateDefinition(request);
 
         // 2. Load Product
         Product product = productHelper.getProductOrThrow(

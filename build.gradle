@@ -18,6 +18,9 @@ repositories {
 }
 
 dependencies{
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	implementation 'redis.clients:jedis:7.2.0' // when we want to use jedis instaed of lattuce which is default
 	//swagger - not giving support spring boot 4 for now
 //	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17")
    // Source: https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-client
@@ -32,7 +35,6 @@ dependencies{
 	implementation 'org.modelmapper:modelmapper:3.2.4'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'redis.clients:jedis:7.2.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-flyway'

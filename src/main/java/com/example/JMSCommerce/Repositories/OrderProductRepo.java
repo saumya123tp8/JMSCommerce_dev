@@ -22,5 +22,5 @@ public interface OrderProductRepo extends JpaRepository<OrderProduct,Long> {
     @Override
     Optional<OrderProduct> findById(Long aLong);
 
-    Optional<OrderProduct> findByIdAndOrderId(Long orderProductId, Long orderId);
+    Optional<OrderProduct> findByIdAndOrder_Id(Long orderProductId, Long orderId);
 }

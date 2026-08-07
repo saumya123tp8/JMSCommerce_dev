@@ -3,13 +3,20 @@ package com.example.JMSCommerce.Utility.validation;
 import com.example.JMSCommerce.DTOs.product.variants.CreateVariantAttributeRequestDTO;
 import com.example.JMSCommerce.DTOs.product.variants.CreateVariantRequestDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
+import com.example.JMSCommerce.Exception.ResourceNotFoundException;
+import com.example.JMSCommerce.Model.ProductVariant;
+import com.example.JMSCommerce.Repositories.ProductVariantRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class VariantValidator {
+
+    private final ProductVariantRepository variantRepository;
 
     public void validate(CreateVariantRequestDTO request) {
 
@@ -71,6 +78,29 @@ public class VariantValidator {
             }
 
         }
+
+    }
+
+    /// / cart
+
+    public ProductVariant validateAndGet(
+            Long variantId
+    ) {
+
+        ProductVariant variant = variantRepository
+                .findById(variantId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Variant not found."
+                        ));
+
+        if (!Boolean.TRUE.equals(variant.getActive())) {
+            throw new BadRequestException(
+                    "Variant is inactive."
+            );
+        }
+
+        return variant;
 
     }
 

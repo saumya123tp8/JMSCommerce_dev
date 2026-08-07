@@ -25,7 +25,7 @@ public class ReviewValidator {
             );
         }
 
-        if (reviewRepository.findByOrderProductId(
+        if (reviewRepository.findByOrderProduct_Id(
                 orderProduct.getId()
         ).isPresent()) {
 

@@ -75,7 +75,7 @@ public class ReviewService {
                 );
 
         return reviewRepository
-                .findByOrderProductProductIdAndStatus(
+                .findByOrderProduct_Product_IdAndStatus(
                         product.getId(),
                         ReviewStatus.ACTIVE
                 )
@@ -137,7 +137,7 @@ public class ReviewService {
         );
 
         Review review =
-                reviewRepository.findByOrderProductId(
+                reviewRepository.findByOrderProduct_Id(
                                 orderProduct.getId()
                         )
                         .orElseThrow(() ->
@@ -173,7 +173,7 @@ public class ReviewService {
         );
 
         Review review =
-                reviewRepository.findByOrderProductId(
+                reviewRepository.findByOrderProduct_Id(
                                 orderProduct.getId()
                         )
                         .orElseThrow(() ->
@@ -196,7 +196,7 @@ public class ReviewService {
     ) {
 
         return orderProductRepo
-                .findByIdAndOrderId(
+                .findByIdAndOrder_Id(
                         orderProductId,
                         orderId
                 )

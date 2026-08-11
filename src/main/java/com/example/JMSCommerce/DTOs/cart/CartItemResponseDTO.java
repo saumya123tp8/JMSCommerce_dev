@@ -38,4 +38,6 @@ public class CartItemResponseDTO {
 
     private Boolean available;
 
+    private String sku;
+
 }

@@ -125,6 +125,7 @@ public class CartAssemblerImpl
                 .totalPrice(totalPrice)
                 .availableStock(variant.getStock())
                 .available(variant.getActive())
+                .sku(variant.getSku())
                 .selectedCustomizations(
                         options.stream()
                                 .map(CustomizationOption::getName)

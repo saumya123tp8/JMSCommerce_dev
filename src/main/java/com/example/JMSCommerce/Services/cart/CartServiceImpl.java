@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +47,8 @@ public class CartServiceImpl
         );
 
         customizationValidator.validateSelection(
-                variant.getProduct(),
+//                variant.getProduct(),
+                variant,
                 request.getCustomizationOptionIds()
         );
 
@@ -59,8 +57,11 @@ public class CartServiceImpl
 
         Optional<CartItemDTO> existing =
                 findMatchingItem(
+
                         cart,
-                        request
+                        variant.getId(),
+                        request.getCustomizationOptionIds(),
+                        null
                 );
 
         if (existing.isPresent()) {
@@ -148,26 +149,59 @@ public class CartServiceImpl
                         item.getVariantId()
                 );
 
-        stockValidator.validate(
-                variant,
-                request.getQuantity()
-        );
 
-        customizationValidator.validateSelection(
-                variant.getProduct(),
-                request.getCustomizationOptionIds()
-        );
 
-        item.setQuantity(
-                request.getQuantity()
-        );
+//        if(request.getCustomizationOptionIds()!=null) {
+// but I have validate even empty because there can be mandatory customization
+            customizationValidator.validateSelection(
+//                variant.getProduct(),
+                    variant,
+                    request.getCustomizationOptionIds()
+            );
+//        }
 
-        item.setCustomizationOptionIds(
-                normalize(
-                        request.getCustomizationOptionIds()
-                )
-        );
 
+
+        List<Long> updatedOptions =
+                normalize(request.getCustomizationOptionIds());
+        Optional<CartItemDTO> duplicate =
+                findMatchingItem(
+
+                        cart,
+                        variant.getId(),
+                        updatedOptions,
+                        item.getId()
+                );
+        if (duplicate.isPresent()) {
+
+            CartItemDTO existing =
+                    duplicate.get();
+
+            int mergedQuantity =
+                    existing.getQuantity()
+                            + request.getQuantity();
+
+            stockValidator.validate(
+                    variant,
+                    mergedQuantity
+            );
+
+            existing.setQuantity(
+                    mergedQuantity
+            );
+
+            cart.getItems().remove(item);
+
+        }else{
+            stockValidator.validate(
+                    variant,
+                    request.getQuantity()
+            );
+            item.setQuantity(
+                    request.getQuantity()
+            );
+            item.setCustomizationOptionIds(updatedOptions);
+        }
         cartRedisService.saveCart(cart);
 
         return cartAssembler.assemble(cart);
@@ -208,28 +242,37 @@ public class CartServiceImpl
     // helper
     private Optional<CartItemDTO> findMatchingItem(
             CartDTO cart,
-            AddCartItemRequestDTO request
+            Long variantId,
+            List<Long> customizationOptionIds,
+            String excludedItemId
     ) {
 
-        List<Long> requested =
-                normalize(request.getCustomizationOptionIds());
+        List<Long> normalized = normalize(customizationOptionIds);
 
         return cart.getItems()
                 .stream()
                 .filter(item ->
-                        item.getVariantId().equals(request.getVariantId())
+                        excludedItemId == null
+                                || !item.getId().equals(excludedItemId)
                 )
                 .filter(item ->
-                        normalize(item.getCustomizationOptionIds())
-                                .equals(requested)
+                        item.getVariantId().equals(variantId)
+                )
+                .filter(item ->
+                        item.getCustomizationOptionIds()
+                                .equals(normalized)
                 )
                 .findFirst();
+
     }
 
     private List<Long> normalize(
             List<Long> ids
     ) {
 
+        if (ids == null) {
+            return Collections.emptyList();
+        }
         return ids.stream()
                 .sorted()
                 .toList();

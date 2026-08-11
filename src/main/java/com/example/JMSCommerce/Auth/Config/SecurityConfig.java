@@ -4,9 +4,7 @@ import com.example.JMSCommerce.Auth.Security.JwtAuthenticationFilter;
 import com.example.JMSCommerce.Auth.Security.OAuth2FailureHandler;
 import com.example.JMSCommerce.Auth.Security.OAuth2SuccessHandler;
 import com.example.JMSCommerce.Utility.ApiResponse;
-
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +20,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,8 +28,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 @Configuration
 // if we want to add security using roles on individual method in any controller
@@ -69,6 +64,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET,"/api/v1/brand/**").permitAll()
                                         .requestMatchers(HttpMethod.GET,"/api/v1/specifications/**").permitAll()
                                         .requestMatchers("/api/v1/reviews/**").permitAll()
+                                        .requestMatchers("/api/v1/cart/**").permitAll()
                                         .requestMatchers("/api/v1/auth/register").permitAll()
                                         .requestMatchers("/api/v1/auth/login").permitAll()
                                         .requestMatchers("/api/v1/auth/refresh").permitAll()

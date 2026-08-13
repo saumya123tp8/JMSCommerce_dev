@@ -1,58 +1,146 @@
 package com.example.JMSCommerce.Adapters;
 
-import com.example.JMSCommerce.DTOs.GetOrderResponseDTO;
-import com.example.JMSCommerce.DTOs.OrderItemResponseDTO;
-import com.example.JMSCommerce.Model.OrderProduct;
+import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.order.OrderItemCustomizationResponseDTO;
+import com.example.JMSCommerce.DTOs.order.OrderItemResponseDTO;
 import com.example.JMSCommerce.Model.Order;
-import com.example.JMSCommerce.Repositories.OrderProductRepo;
+import com.example.JMSCommerce.Model.OrderItem;
+import com.example.JMSCommerce.Model.OrderItemCustomization;
+import com.example.JMSCommerce.Model.ProductVariant;
+import com.example.JMSCommerce.Repositories.OrderItemCustomizationRepository;
+import com.example.JMSCommerce.Repositories.OrderItemRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class OrderAdapter {
-    private final OrderProductRepo orderProductRepo;
+    private final OrderItemRepo orderItemRepo;
+    private final OrderItemCustomizationRepository orderItemCustomizationRepository;
     public List<GetOrderResponseDTO> mapToGetOrderResponseDTOList(List<Order> orders) {
         return orders.stream().map(this::mapToGetOrderResponseDTO).collect(Collectors.toList());
     }
+    public OrderItemCustomizationResponseDTO mapToOrderItemCustomizationResponseDTO(OrderItemCustomization orderItemCustomization){
+        return OrderItemCustomizationResponseDTO.builder()
+                .customizationOptionId(orderItemCustomization.getCustomizationOptionId())
+                .name(orderItemCustomization.getName())
+                .priceAdjustment(orderItemCustomization.getPriceAdjustment())
+                .build();
+    }
+    public List<OrderItemCustomizationResponseDTO> mapToOrderItemCustomizationResponseListDTO(List<OrderItemCustomization> orderItemCustomizationList){
+       return orderItemCustomizationList.stream().map(orderItemCustomization -> mapToOrderItemCustomizationResponseDTO(orderItemCustomization)).collect(Collectors.toList());
+    }
     public GetOrderResponseDTO mapToGetOrderResponseDTO(Order order) {
-       List<OrderProduct> listOrderItem = new ArrayList<>();
-       listOrderItem = orderProductRepo.findByOrder_Id(order.getId());
-        System.out.println("order_product");
-//        System.out.println(listOrderItem);
-        listOrderItem.forEach(System.out::println);
-       List<OrderItemResponseDTO> OrderItems = mapToOrderItemResponseDTOList(listOrderItem);
-        OrderItems.forEach(System.out::println);
-       return GetOrderResponseDTO.builder()
-               .orderStatus(String.valueOf(order.getStatus()))
-               .createdAt(order.getCreatedAt())
-               .updatedAt(order.getUpdatedAt())
-               .deliveredAt((order.getDeliveredAt()))
-               .currentSubtotal(order.getCurrentSubtotal())
-               .orderItems(OrderItems)
-               .build();
 
+        List<OrderItem> orderItems =
+                orderItemRepo.findByOrder_Id(order.getId());
+
+        List<Long> orderItemIds =
+                orderItems.stream()
+                        .map(OrderItem::getId)
+                        .toList();
+
+        List<OrderItemCustomization> customizations =
+                orderItemIds.isEmpty()
+                        ? List.of()
+                        : orderItemCustomizationRepository
+                        .findAllByOrderItem_IdIn(orderItemIds);
+
+        Map<Long, List<OrderItemCustomization>> customizationMap =
+                customizations.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        customization ->
+                                                customization
+                                                        .getOrderItem()
+                                                        .getId()
+                                )
+                        );
+
+        List<OrderItemResponseDTO> orderItemResponses =
+                orderItems.stream()
+                        .map(orderItem ->
+                                mapToOrderItemResponseDTO(
+                                        orderItem,
+                                        customizationMap
+                                )
+                        )
+                        .toList();
+
+        return GetOrderResponseDTO.builder()
+                .id(order.getId())
+                .orderStatus(order.getStatus())
+                .paymentStatus(order.getPaymentStatus())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .deliveredAt(order.getDeliveredAt())
+                .subtotal(order.getSubtotal())
+                .discount(order.getDiscount())
+                .tax(order.getTax())
+                .deliveryCharge(order.getDeliveryCharge())
+                .grandTotal(order.getGrandTotal())
+                .orderItems(orderItemResponses)
+                .build();
     }
 
-    private List<OrderItemResponseDTO> mapToOrderItemResponseDTOList(List<OrderProduct> listOrderItem) {
 
-        return listOrderItem.stream().map(this::mapToOrderItemResponseDTO).collect(Collectors.toList());
+    private OrderItemResponseDTO mapToOrderItemResponseDTO(
+            OrderItem orderItem,
+            Map<Long, List<OrderItemCustomization>> customizationMap
+    ) {
 
-    }
+        ProductVariant variant =
+                orderItem.getVariant();
 
-    private OrderItemResponseDTO mapToOrderItemResponseDTO(OrderProduct orderProduct) {
+        List<OrderItemCustomizationResponseDTO> customizations =
+                customizationMap
+                        .getOrDefault(
+                                orderItem.getId(),
+                                List.of()
+                        )
+                        .stream()
+                        .map(this::mapToOrderItemCustomizationResponseDTO)
+                        .toList();
+
         return OrderItemResponseDTO.builder()
-                .productId(orderProduct.getProduct().getId())
-                .quantity(orderProduct.getQuantity())
-                .productImage((orderProduct.getProduct().getPrimaryImage()))
-                .productName(orderProduct.getProduct().getName())
-//                .productPrice(orderProduct.getProduct().getMrp())
-//                .subTotal((orderProduct.getProduct().getMrp()).multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
+                .productId(
+                        variant.getProduct().getId()
+                )
+                .variantId(
+                        variant.getId()
+                )
+                .productName(
+                        orderItem.getProductName()
+                )
+                .variantName(
+                        orderItem.getVariantName()
+                )
+                .sku(
+                        orderItem.getSku()
+                )
+                .quantity(
+                        orderItem.getQuantity()
+                )
+                .mrp(
+                        orderItem.getMrp()
+                )
+                .sellingPrice(
+                        orderItem.getSellingPrice()
+                )
+                .customizationPrice(
+                        orderItem.getCustomizationPrice()
+                )
+                .subTotal(
+                        orderItem.getTotalPrice()
+                )
+                .productImage(
+                        variant.getProduct().getPrimaryImage()
+                )
+                .customizations(customizations)
                 .build();
     }
 }

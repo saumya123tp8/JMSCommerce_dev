@@ -1,4 +1,4 @@
-package com.example.JMSCommerce.DTOs;
+package com.example.JMSCommerce.DTOs.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

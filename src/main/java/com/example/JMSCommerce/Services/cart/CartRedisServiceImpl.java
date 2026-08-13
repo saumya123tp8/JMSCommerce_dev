@@ -13,7 +13,7 @@ import java.time.Duration;
 public class CartRedisServiceImpl
         implements CartRedisService {
 
-    private static final String PREFIX = "cart:";
+    private static final String PREFIX = "cart:user:";
 
 //    private static final Duration TTL =
 //            Duration.ofDays(30);
@@ -26,10 +26,10 @@ public class CartRedisServiceImpl
     public CartDTO getCart(
             String ownerId
     ) {
-
+        String key = buildKey(ownerId);
         CartDTO cart = cartRedisTemplate
                 .opsForValue()
-                .get(buildKey(ownerId));
+                .get(key);
 
         if (cart == null) {
 

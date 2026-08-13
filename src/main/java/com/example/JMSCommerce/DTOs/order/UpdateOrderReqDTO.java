@@ -1,4 +1,4 @@
-package com.example.JMSCommerce.DTOs;
+package com.example.JMSCommerce.DTOs.order;
 
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import lombok.AllArgsConstructor;

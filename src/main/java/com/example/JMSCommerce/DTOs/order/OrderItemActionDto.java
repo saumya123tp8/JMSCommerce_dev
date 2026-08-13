@@ -1,5 +1,6 @@
-package com.example.JMSCommerce.DTOs;
+package com.example.JMSCommerce.DTOs.order;
 
+import com.example.JMSCommerce.Utility.enums.AddressType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +16,5 @@ public class OrderItemActionDto {
 
     private Integer quantity;
 
-    private OrderItemAction action;
+    private AddressType.OrderItemAction action;
 }

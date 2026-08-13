@@ -2,7 +2,7 @@ package com.example.JMSCommerce.Utility.validation;
 
 import com.example.JMSCommerce.DTOs.review.CreateReviewRequestDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
-import com.example.JMSCommerce.Model.OrderProduct;
+import com.example.JMSCommerce.Model.OrderItem;
 import com.example.JMSCommerce.Repositories.ReviewRepository;
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
@@ -15,18 +15,18 @@ public class ReviewValidator {
     private final ReviewRepository reviewRepository;
 
     public void validateCreate(
-            OrderProduct orderProduct,
+            OrderItem orderItem,
             CreateReviewRequestDTO request
     ) {
 
-        if (orderProduct.getOrder().getStatus() != OrderStatus.Delivered) {
+        if (orderItem.getOrder().getStatus() != OrderStatus.DELIVERED) {
             throw new BadRequestException(
                     "Review can only be submitted after order delivery."
             );
         }
 
-        if (reviewRepository.findByOrderProduct_Id(
-                orderProduct.getId()
+        if (reviewRepository.findByOrderItem_Id(
+                orderItem.getId()
         ).isPresent()) {
 
             throw new BadRequestException(

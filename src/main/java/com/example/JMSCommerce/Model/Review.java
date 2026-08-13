@@ -53,8 +53,8 @@ public class Review extends BaseEntity {
 //    private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_product_id", nullable = false)
-    private OrderProduct orderProduct;
+    @JoinColumn(name = "order_item_id", nullable = false)
+    private OrderItem orderItem;
     //without order a user can not review the product
 
 

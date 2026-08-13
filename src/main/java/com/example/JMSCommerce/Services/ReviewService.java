@@ -7,11 +7,11 @@ import com.example.JMSCommerce.DTOs.review.ReviewResponseDTO;
 import com.example.JMSCommerce.DTOs.review.UpdateReviewRequestDTO;
 import com.example.JMSCommerce.Exception.AccessDeniedException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
-import com.example.JMSCommerce.Model.OrderProduct;
+import com.example.JMSCommerce.Model.OrderItem;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Model.Review;
 import com.example.JMSCommerce.Model.User;
-import com.example.JMSCommerce.Repositories.OrderProductRepo;
+import com.example.JMSCommerce.Repositories.OrderItemRepo;
 import com.example.JMSCommerce.Repositories.ProductRepo;
 import com.example.JMSCommerce.Repositories.ReviewRepository;
 import com.example.JMSCommerce.Repositories.UserRepo;
@@ -32,7 +32,7 @@ public class ReviewService {
     private final ReviewRepository orderReviewRepository;
     private final OrderReviewAdapter orderReviewAdapter;
     private final ReviewRepository reviewRepository;
-    private final OrderProductRepo orderProductRepo;
+    private final OrderItemRepo orderItemRepo;
     private final ProductRepo productRepository;
 
     private final ReviewAdapter reviewAdapter;
@@ -75,7 +75,7 @@ public class ReviewService {
                 );
 
         return reviewRepository
-                .findByOrderProduct_Product_IdAndStatus(
+                .findByOrderItem_Variant_IdAndStatus(
                         product.getId(),
                         ReviewStatus.ACTIVE
                 )
@@ -90,34 +90,35 @@ public class ReviewService {
 
     public ReviewResponseDTO createReview(
             Long orderId,
-            Long orderProductId,
+            Long orderItemId,
             CreateReviewRequestDTO request
     ) {
 
-        OrderProduct orderProduct = getOrderProduct(
+        OrderItem orderItem = getOrderItem(
                 orderId,
-                orderProductId
+                orderItemId
         );
         User currentUser = getCurrentUserId();
-        if (!orderProduct.getOrder().getUser().getId().equals(currentUser.getId())) {
+        if (!orderItem.getOrder().getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Access Denied");
         }
 
         reviewValidator.validateCreate(
-                orderProduct,
+                orderItem,
                 request
         );
 
         Review review = reviewAdapter.toEntity(
                 request,
-                orderProduct
+                orderItem
         );
 
         Review savedReview =
                 reviewRepository.save(review);
 
         ratingSyncService.syncRating(
-                orderProduct.getProduct()
+//                orderItem.getProduct()
+                orderItem.getVariant().getProduct()
         );
 
         return reviewAdapter.toResponse(
@@ -127,18 +128,18 @@ public class ReviewService {
 
     public ReviewResponseDTO updateReview(
             Long orderId,
-            Long orderProductId,
+            Long orderItemId,
             UpdateReviewRequestDTO request
     ) {
 
-        OrderProduct orderProduct = getOrderProduct(
+        OrderItem orderItem = getOrderItem(
                 orderId,
-                orderProductId
+                orderItemId
         );
 
         Review review =
-                reviewRepository.findByOrderProduct_Id(
-                                orderProduct.getId()
+                reviewRepository.findByOrderItem_Id(
+                                orderItem.getId()
                         )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
@@ -155,7 +156,8 @@ public class ReviewService {
                 reviewRepository.save(review);
 
         ratingSyncService.syncRating(
-                orderProduct.getProduct()
+//                orderItem.getProduct()
+                orderItem.getVariant().getProduct()
         );
 
         return reviewAdapter.toResponse(saved);
@@ -167,14 +169,14 @@ public class ReviewService {
             Long orderProductId
     ) {
 
-        OrderProduct orderProduct = getOrderProduct(
+        OrderItem orderItem = getOrderItem(
                 orderId,
                 orderProductId
         );
 
         Review review =
-                reviewRepository.findByOrderProduct_Id(
-                                orderProduct.getId()
+                reviewRepository.findByOrderItem_Id(
+                                orderItem.getId()
                         )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
@@ -184,20 +186,21 @@ public class ReviewService {
         reviewRepository.delete(review);
 
         ratingSyncService.syncRating(
-                orderProduct.getProduct()
+//                orderItem.getProduct()
+                orderItem.getVariant().getProduct()
         );
     }
 
     /*------------------------------------------------*/
 
-    private OrderProduct getOrderProduct(
+    private OrderItem getOrderItem(
             Long orderId,
-            Long orderProductId
+            Long orderItemId
     ) {
 
-        return orderProductRepo
+        return orderItemRepo
                 .findByIdAndOrder_Id(
-                        orderProductId,
+                        orderItemId,
                         orderId
                 )
                 .orElseThrow(() ->
@@ -215,7 +218,8 @@ public class ReviewService {
         return reviewRepository
                 .findById(reviewId)
                 .filter(review ->
-                        review.getOrderProduct()
+                        review.getOrderItem()
+                                .getVariant()
                                 .getProduct()
                                 .getId()
                                 .equals(productId)

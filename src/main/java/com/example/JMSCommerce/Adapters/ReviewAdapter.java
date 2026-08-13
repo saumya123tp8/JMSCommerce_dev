@@ -2,7 +2,7 @@ package com.example.JMSCommerce.Adapters;
 
 import com.example.JMSCommerce.DTOs.review.CreateReviewRequestDTO;
 import com.example.JMSCommerce.DTOs.review.ReviewResponseDTO;
-import com.example.JMSCommerce.Model.OrderProduct;
+import com.example.JMSCommerce.Model.OrderItem;
 import com.example.JMSCommerce.Model.Review;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ public class ReviewAdapter {
 
     public Review toEntity(
             CreateReviewRequestDTO request,
-            OrderProduct orderProduct
+            OrderItem orderItem
     ) {
 
         return Review.builder()
@@ -19,7 +19,7 @@ public class ReviewAdapter {
                 .title(request.getTitle())
                 .reviewText(request.getReviewText())
                 .verifiedPurchase(true)
-                .orderProduct(orderProduct)
+                .orderItem(orderItem)
                 .build();
 
     }
@@ -37,7 +37,7 @@ public class ReviewAdapter {
                 .helpfulCount(review.getHelpfulCount())
                 .createdAt(review.getCreatedAt())
                 .reviewerName(
-                        review.getOrderProduct()
+                        review.getOrderItem()
                                 .getOrder()
                                 .getUser()
                                 .getName()

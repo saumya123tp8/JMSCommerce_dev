@@ -22,7 +22,7 @@ public class ProductRatingSyncService {
 
     public void syncRating(Product product) {
         List<Review> reviews =
-                reviewRepository.findByOrderProduct_Product_IdAndStatus(
+                reviewRepository.findByOrderItem_Variant_IdAndStatus(
                         product.getId(),
                         ReviewStatus.ACTIVE
                 );

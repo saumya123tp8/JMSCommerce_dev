@@ -1,10 +1,12 @@
 package com.example.JMSCommerce.Utility;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public final class SecurityUtils {
 
+@RequiredArgsConstructor
+public final class SecurityUtils {
 
 //    public static Long getCurrentUserId() {
 //        Authentication authentication =
@@ -24,4 +26,5 @@ public final class SecurityUtils {
         String email = authentication.getPrincipal().toString();
         return email;
     }
+
 }

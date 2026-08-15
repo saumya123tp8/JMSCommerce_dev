@@ -73,6 +73,9 @@ public class OrderAdapter {
 
         return GetOrderResponseDTO.builder()
                 .id(order.getId())
+                .userId(order.getUser().getId())
+                .userName(order.getUser().getName())
+                .userEmail(order.getUser().getEmail())
                 .orderStatus(order.getStatus())
                 .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt())

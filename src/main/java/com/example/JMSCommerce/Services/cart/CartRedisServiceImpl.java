@@ -13,7 +13,7 @@ import java.time.Duration;
 public class CartRedisServiceImpl
         implements CartRedisService {
 
-    private static final String PREFIX = "cart:user:";
+    private static final String PREFIX = "cart:";
 
 //    private static final Duration TTL =
 //            Duration.ofDays(30);

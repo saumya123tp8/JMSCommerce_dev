@@ -59,14 +59,21 @@ public class ProductHelper {
         }
     }
     public void validateDuplicateProductName(
-            String name
+            String name, Long brand_id
     ) {
 
-        if (productRepo.existsByNameIgnoreCase(name.trim())) {
+//        if (productRepo.existsByNameIgnoreCase(name.trim())) {
+        if (brand_id!=null&&productRepo.existsByNameIgnoreCaseAndBrand_Id(name.trim(),brand_id)) {
             throw new BadRequestException(
                     "Product with name '" + name + "' already exists."
             );
         }
+        if (brand_id==null&&productRepo.existsByNameIgnoreCase(name.trim())) {
+            throw new BadRequestException(
+                    "Product with name '" + name + "' already exists."
+            );
+        }
+
     }
 
     //    public void validateSku(

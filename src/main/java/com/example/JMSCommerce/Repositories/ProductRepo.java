@@ -50,4 +50,6 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
 
     @Query( "SELECT p from Product p where p.status = :status ")
     List<Product> findAllByStatus(ProductStatus status);
+
+    boolean existsByNameIgnoreCaseAndBrand_Id(String trim, Long id);
 }

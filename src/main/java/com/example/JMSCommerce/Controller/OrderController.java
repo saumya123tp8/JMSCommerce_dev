@@ -1,6 +1,7 @@
 package com.example.JMSCommerce.Controller;
 
 import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.payment.MockPaymentRequestDTO;
 import com.example.JMSCommerce.Services.OrderService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
@@ -19,10 +20,16 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping
+    @GetMapping("/admin-all")
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
     public ResponseEntity<ApiResponse<List<GetOrderResponseDTO>>> getAllOrders(){
           return ResponseEntity.ok().body(ApiResponse.success(orderService.getAllOrders(),"All Orders Fetched Successfully"));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<GetOrderResponseDTO>>> getAllOrderByCurrUser(){
+//        return orderService.getOrderByOrderId(id);
+        return ResponseEntity.ok().body(ApiResponse.success(orderService.getAllOrderByCurrUser(),"order data fetched successfully"));
     }
 
 
@@ -47,18 +54,20 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(orderService.getOrderByOrderIdCurrUser(id),"order data fetched successfully"));
     }
 
+
     // TODO //
-    @GetMapping("/by-user/{id}")
+    @GetMapping("/by-user/{user_id}")
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
     public ResponseEntity<ApiResponse<List<GetOrderResponseDTO>>> getAllOrderByUserId(@PathVariable Long user_id){
         return ResponseEntity.ok().body(ApiResponse.success(orderService.getAllOrderByUserId(user_id),"order deleted successfully"));
     }
 
     // TODO //
-    @GetMapping("/by-status/{id}")
+    @GetMapping("/by-status/{status}")
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
     public ResponseEntity<ApiResponse<List<GetOrderResponseDTO>>> getAllOrderByOrderStatus(@PathVariable String status){
-        return ResponseEntity.ok().body(ApiResponse.success(orderService.getAllOrderByOrderStatus(status),"order deleted successfully"));
+        String capitalizedStatus = status.toUpperCase();
+        return ResponseEntity.ok().body(ApiResponse.success(orderService.getAllOrderByOrderStatus(capitalizedStatus),"order deleted successfully"));
     }
 
     @PostMapping("/{id}/cancel")
@@ -76,6 +85,35 @@ public class OrderController {
                 )
         );
     }
+
+    //payment
+    @PostMapping("/{id}/payment")
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> payOrder(
+            @PathVariable Long id,
+            @RequestBody MockPaymentRequestDTO request
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        orderService.payOrder(id, request),
+                        "Payment processed successfully"
+                )
+        );
+    }
+    @PostMapping("/{id}/payment/retry")
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> retryPayment(
+            @PathVariable Long id,
+            @RequestBody MockPaymentRequestDTO request
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        orderService.retryPayment(id, request),
+                        "Payment retry processed successfully"
+                )
+        );
+    }
+
     //    @PostMapping
 //    @PermitAll
 //    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> createOrder(@RequestBody CreateOrderRequestDTO createOrderRequestDTO){

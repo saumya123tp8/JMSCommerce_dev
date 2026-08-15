@@ -6,11 +6,13 @@ import com.example.JMSCommerce.DTOs.cart.CartItemDTO;
 import com.example.JMSCommerce.DTOs.order.CreateOrderRequestDTO;
 import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
 import com.example.JMSCommerce.DTOs.order.UpdateOrderReqDTO;
+import com.example.JMSCommerce.DTOs.payment.MockPaymentRequestDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.CompulsoryDataMissingException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.*;
 import com.example.JMSCommerce.Repositories.*;
+import com.example.JMSCommerce.Services.cart.CartOwnerProvider;
 import com.example.JMSCommerce.Services.cart.CartRedisService;
 import com.example.JMSCommerce.Utility.SecurityUtils;
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,8 +49,11 @@ public class OrderService {
     private final OrderItemCustomizationRepository orderItemCustomizationRepository;
 
     private final ValidateStatusTransition validateStatusTransition;
+    private final CartOwnerProvider cartOwnerProvider;
+    // also need to give some filter eg. address , status( we have ),
 
     public List<GetOrderResponseDTO> getAllOrders() {
+        //we should have user_id and address to group all record
         List<Order> orders = orderRepo.findAll();
         return orderAdapter.mapToGetOrderResponseDTOList(orders);
     }
@@ -326,9 +332,9 @@ public class OrderService {
                                         "Current user not found."
                                 )
                         );
-
+        String ownerId = cartOwnerProvider.getOwnerId();
         CartDTO cart =
-                cartRedisService.getCart(currUserEmail);
+                cartRedisService.getCart(ownerId);
 
         if (cart.getItems() == null ||
                 cart.getItems().isEmpty()) {
@@ -527,5 +533,169 @@ public class OrderService {
 
         return orderAdapter
                 .mapToGetOrderResponseDTO(savedOrder);
+    }
+
+
+    @Transactional
+    public GetOrderResponseDTO payOrder(
+            Long orderId,
+            MockPaymentRequestDTO request
+    ) {
+
+        String currentUserMail =
+                SecurityUtils.getCurrentUserMail();
+
+        Order order =
+                orderRepo.findByIdAndUser_email(
+                                orderId,
+                                currentUserMail
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found"
+                                )
+                        );
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException(
+                    "Cancelled order cannot be paid."
+            );
+        }
+
+        if (order.getStatus() == OrderStatus.CONFIRMED) {
+            throw new BadRequestException(
+                    "Order is already confirmed."
+            );
+        }
+
+        if (order.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            throw new BadRequestException(
+                    "Payment has already been completed."
+            );
+        }
+
+        if (order.getPaymentStatus() != PaymentStatus.PENDING) {
+            throw new BadRequestException(
+                    "Payment cannot be processed for this order."
+            );
+        }
+
+        if (request.isSuccess()) {
+
+            order.setPaymentStatus(
+                    PaymentStatus.SUCCESS
+            );
+
+            order.setStatus(
+                    OrderStatus.CONFIRMED
+            );
+
+            Order savedOrder =
+                    orderRepo.save(order);
+
+            // Payment succeeded → cart can now be cleared
+            String ownerId = cartOwnerProvider.getOwnerId();
+            cartRedisService.deleteCart(
+                    ownerId
+            );
+
+            return orderAdapter
+                    .mapToGetOrderResponseDTO(savedOrder);
+        }
+
+        order.setPaymentStatus(
+                PaymentStatus.FAILED
+        );
+
+        Order savedOrder =
+                orderRepo.save(order);
+
+        return orderAdapter
+                .mapToGetOrderResponseDTO(savedOrder);
+    }
+
+
+    @Transactional
+    public GetOrderResponseDTO retryPayment(
+            Long orderId,
+            MockPaymentRequestDTO request
+    ) {
+
+        String currentUserMail =
+                SecurityUtils.getCurrentUserMail();
+
+        Order order =
+                orderRepo.findByIdAndUser_email(
+                                orderId,
+                                currentUserMail
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found"
+                                )
+                        );
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException(
+                    "Cancelled order cannot be paid."
+            );
+        }
+
+        if (order.getStatus() == OrderStatus.CONFIRMED) {
+            throw new BadRequestException(
+                    "Order is already confirmed."
+            );
+        }
+
+        if (order.getPaymentStatus() != PaymentStatus.FAILED) {
+            throw new BadRequestException(
+                    "Payment retry is allowed only for failed payments."
+            );
+        }
+
+        // Start another payment attempt
+        order.setPaymentStatus(
+                PaymentStatus.PENDING
+        );
+
+        if (request.isSuccess()) {
+
+            order.setPaymentStatus(
+                    PaymentStatus.SUCCESS
+            );
+
+            order.setStatus(
+                    OrderStatus.CONFIRMED
+            );
+
+            Order savedOrder =
+                    orderRepo.save(order);
+
+            String ownerId = cartOwnerProvider.getOwnerId();
+            cartRedisService.deleteCart(
+                    ownerId
+            );
+
+            return orderAdapter
+                    .mapToGetOrderResponseDTO(savedOrder);
+        }
+
+        order.setPaymentStatus(
+                PaymentStatus.FAILED
+        );
+
+        Order savedOrder =
+                orderRepo.save(order);
+
+        return orderAdapter
+                .mapToGetOrderResponseDTO(savedOrder);
+    }
+
+    public List<GetOrderResponseDTO> getAllOrderByCurrUser() {
+        String currentUserMail = SecurityUtils.getCurrentUserMail();
+        List<Order> orderList = orderRepo
+                .findByUser_email(currentUserMail);
+
+        return orderList.stream().map(order->orderAdapter.mapToGetOrderResponseDTO(order)).collect(Collectors.toList());
     }
 }

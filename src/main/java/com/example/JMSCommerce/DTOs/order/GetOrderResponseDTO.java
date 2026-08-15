@@ -17,6 +17,12 @@ public class GetOrderResponseDTO {
 
     private Long id;
 
+    private Long userId;
+
+    private String userName;
+
+    private String userEmail;
+
     private OrderStatus orderStatus;
 
     private PaymentStatus paymentStatus;

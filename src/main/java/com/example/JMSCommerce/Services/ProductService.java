@@ -19,9 +19,7 @@ import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +74,8 @@ public class ProductService {
         String normalizedName = productHelper.normalizeName(productCreateDTO.getName());
         productCreateDTO.setName(normalizedName);
         productHelper.validateDuplicateProductName(
-                productCreateDTO.getName()
+                productCreateDTO.getName(),
+                productCreateDTO.getBrandId()
         );
 
 //        productHelper.validateSellingPrice(
@@ -376,7 +375,8 @@ public class ProductService {
         request.setName(normalizedName);
 
         productHelper.validateDuplicateProductName(
-                request.getName()
+                request.getName(),
+                request.getBrandId()
         );
 
 //        productHelper.validateSellingPrice(

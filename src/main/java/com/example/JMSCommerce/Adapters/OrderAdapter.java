@@ -1,12 +1,10 @@
 package com.example.JMSCommerce.Adapters;
 
 import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.order.OrderDeliveryAddressResponseDTO;
 import com.example.JMSCommerce.DTOs.order.OrderItemCustomizationResponseDTO;
 import com.example.JMSCommerce.DTOs.order.OrderItemResponseDTO;
-import com.example.JMSCommerce.Model.Order;
-import com.example.JMSCommerce.Model.OrderItem;
-import com.example.JMSCommerce.Model.OrderItemCustomization;
-import com.example.JMSCommerce.Model.ProductVariant;
+import com.example.JMSCommerce.Model.*;
 import com.example.JMSCommerce.Repositories.OrderItemCustomizationRepository;
 import com.example.JMSCommerce.Repositories.OrderItemRepo;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +78,12 @@ public class OrderAdapter {
                 .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
-                .deliveredAt(order.getDeliveredAt())
+                .orderNumber(order.getOrderNumber())
+                .deliveryAddress(
+                        mapToDeliveryAddressResponseDTO(
+                                order.getDeliveryAddress()
+                        )
+                )
                 .subtotal(order.getSubtotal())
                 .discount(order.getDiscount())
                 .tax(order.getTax())
@@ -144,6 +147,34 @@ public class OrderAdapter {
                         variant.getProduct().getPrimaryImage()
                 )
                 .customizations(customizations)
+                .build();
+    }
+
+    private OrderDeliveryAddressResponseDTO
+    mapToDeliveryAddressResponseDTO(
+            OrderDeliveryAddress address
+    ) {
+
+        if (address == null) {
+            return null;
+        }
+
+        return OrderDeliveryAddressResponseDTO.builder()
+                .receiverName(address.getReceiverName())
+                .receiverPhone(address.getReceiverPhone())
+                .countryCode(address.getCountryCode())
+                .houseNumber(address.getHouseNumber())
+                .apartment(address.getApartment())
+                .street(address.getStreet())
+                .landmark(address.getLandmark())
+                .city(address.getCity())
+                .state(address.getState())
+                .country(address.getCountry())
+                .pincode(address.getPincode())
+                .type(address.getType())
+                .deliveryInstructions(
+                        address.getDeliveryInstructions()
+                )
                 .build();
     }
 }

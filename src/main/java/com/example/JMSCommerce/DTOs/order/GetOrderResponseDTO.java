@@ -31,8 +31,6 @@ public class GetOrderResponseDTO {
 
     private LocalDateTime updatedAt;
 
-    private String deliveredAt;
-
     private BigDecimal subtotal;
 
     private BigDecimal discount;
@@ -44,4 +42,8 @@ public class GetOrderResponseDTO {
     private BigDecimal grandTotal;
 
     private List<OrderItemResponseDTO> orderItems;
+
+    private String orderNumber;
+
+    private OrderDeliveryAddressResponseDTO deliveryAddress;
 }

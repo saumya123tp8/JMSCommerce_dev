@@ -55,11 +55,24 @@ public class Order extends BaseEntity{
     @Column(nullable = false)
     private BigDecimal grandTotal;
 
-    private String deliveredAt;
+    @OneToOne(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "delivery_address_id",
+            nullable = false
+    )
+    private OrderDeliveryAddress deliveryAddress;
+
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(nullable = false, unique = true)
+    private String orderNumber;
 
 
 }

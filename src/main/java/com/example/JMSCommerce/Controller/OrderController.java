@@ -1,10 +1,13 @@
 package com.example.JMSCommerce.Controller;
 
 import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.order.PlaceOrderRequestDTO;
+import com.example.JMSCommerce.DTOs.order.UpdateOrderReqDTO;
 import com.example.JMSCommerce.DTOs.payment.MockPaymentRequestDTO;
 import com.example.JMSCommerce.Services.OrderService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +38,8 @@ public class OrderController {
 
 //now we don't need request from user anymore we will take it from cart
     @PostMapping
-    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> createOrder(){
-        GetOrderResponseDTO getOrderResponseDTO= orderService.placeOrder();
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> createOrder(@Valid @RequestBody PlaceOrderRequestDTO request){
+        GetOrderResponseDTO getOrderResponseDTO= orderService.placeOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(getOrderResponseDTO,"Order Created Successfully"));
     }
 
@@ -100,6 +103,23 @@ public class OrderController {
                 )
         );
     }
+    @PutMapping("/{id}/status")
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    public ResponseEntity<ApiResponse<Void>> updateOrderStatusAdmin(
+            @PathVariable Long id,
+            @RequestBody UpdateOrderReqDTO request
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        orderService.updateOrderStatusAdmin(id, request),
+                        "Status Updated Successully"
+                )
+        );
+    }
+
+
+
     @PostMapping("/{id}/payment/retry")
     public ResponseEntity<ApiResponse<GetOrderResponseDTO>> retryPayment(
             @PathVariable Long id,
@@ -148,5 +168,22 @@ public class OrderController {
 //        return ResponseEntity.ok().body(ApiResponse.success(orderService.updateOrderByOrderIdCurrUser(id,updateOrderReqDTO),"order deleted successfully"));
 //    }
 
+
+// OrderController.java
+public record RefundDecisionRequest(boolean approve, String reason) {}
+
+    @PostMapping("/{id}/refund-decision")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DEVELOPER')")
+    public ResponseEntity<ApiResponse<GetOrderResponseDTO>> decideRefund(
+            @PathVariable Long id,
+            @RequestBody RefundDecisionRequest request
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        orderService.decideRefund(id, request.approve(), request.reason()),
+                        request.approve() ? "Refund approved" : "Refund declined"
+                )
+        );
+    }
 
 }

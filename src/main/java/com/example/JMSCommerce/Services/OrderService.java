@@ -5,6 +5,7 @@ import com.example.JMSCommerce.DTOs.cart.CartDTO;
 import com.example.JMSCommerce.DTOs.cart.CartItemDTO;
 import com.example.JMSCommerce.DTOs.order.CreateOrderRequestDTO;
 import com.example.JMSCommerce.DTOs.order.GetOrderResponseDTO;
+import com.example.JMSCommerce.DTOs.order.PlaceOrderRequestDTO;
 import com.example.JMSCommerce.DTOs.order.UpdateOrderReqDTO;
 import com.example.JMSCommerce.DTOs.payment.MockPaymentRequestDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
@@ -26,7 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +43,7 @@ public class OrderService {
     private final OrderAdapter orderAdapter;
     private final ProductRepo productRepo;
     private final OrderItemRepo orderItemRepo;
+    private final AddressRepository addressRepository;
 
     private final CartRedisService cartRedisService;
     private final VariantValidator variantValidator;
@@ -320,7 +325,7 @@ public class OrderService {
     }
 
     @Transactional
-    public GetOrderResponseDTO placeOrder() {
+    public GetOrderResponseDTO placeOrder(PlaceOrderRequestDTO placeOrderRequestDTO) {
 
         String currUserEmail =
                 SecurityUtils.getCurrentUserMail();
@@ -332,6 +337,18 @@ public class OrderService {
                                         "Current user not found."
                                 )
                         );
+
+        Address address =
+                addressRepository.findByIdAndUser_Id(
+                                placeOrderRequestDTO.getAddressId(),
+                                user.getId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Delivery address not found."
+                                )
+                        );
+
         String ownerId = cartOwnerProvider.getOwnerId();
         CartDTO cart =
                 cartRedisService.getCart(ownerId);
@@ -343,9 +360,32 @@ public class OrderService {
                     "Cart is empty."
             );
         }
+//        cascade = CascadeType.ALL
+//        saving the order will also save the OrderDeliveryAddress.
+
+        OrderDeliveryAddress deliveryAddress =
+                OrderDeliveryAddress.builder()
+                        .receiverName(address.getReceiverName())
+                        .receiverPhone(address.getReceiverPhone())
+                        .countryCode(address.getCountryCode())
+                        .houseNumber(address.getHouseNumber())
+                        .apartment(address.getApartment())
+                        .street(address.getStreet())
+                        .landmark(address.getLandmark())
+                        .city(address.getCity())
+                        .state(address.getState())
+                        .country(address.getCountry())
+                        .pincode(address.getPincode())
+                        .type(address.getType())
+                        .deliveryInstructions(
+                                address.getDeliveryInstructions()
+                        )
+                        .build();
 
         Order order = Order.builder()
+                .orderNumber(generateOrderNumber())
                 .user(user)
+                .deliveryAddress(deliveryAddress)
                 .status(OrderStatus.PENDING)
                 .paymentStatus(PaymentStatus.PENDING)
                 .subtotal(BigDecimal.ZERO)
@@ -697,5 +737,65 @@ public class OrderService {
                 .findByUser_email(currentUserMail);
 
         return orderList.stream().map(order->orderAdapter.mapToGetOrderResponseDTO(order)).collect(Collectors.toList());
+    }
+
+    private String generateOrderNumber() {
+
+        return "JMS-" +
+                LocalDateTime.now()
+                        .format(
+                                DateTimeFormatter.ofPattern(
+                                        "yyyyMMddHHmmssSSS"
+                                )
+                        ) +
+                "-" +
+                UUID.randomUUID()
+                        .toString()
+                        .substring(0, 6)
+                        .toUpperCase();
+    }
+
+    public Void updateOrderStatusAdmin(Long id,UpdateOrderReqDTO request) {
+        Order order = orderRepo.findById(id).orElseThrow(()->{
+           throw new ResourceNotFoundException("No such order") ;
+        });
+        // check valid state transition
+        OrderStatus finalOrderStatus;
+        OrderStatus currOrderStatus = order.getStatus();
+        finalOrderStatus = request.getStatus();
+        if(!currOrderStatus.canTransitionTo(finalOrderStatus)){
+            throw new IllegalStateException(
+                    String.format("Cannot transition order status from %s to %s", currOrderStatus, finalOrderStatus)
+            );
+        }
+        order.setStatus(finalOrderStatus);
+        orderRepo.save(order);
+        return null;
+    }
+
+    // OrderService.java
+    public GetOrderResponseDTO decideRefund(Long orderId, boolean approve, String reason) {
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
+
+        if (order.getStatus() != OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Only cancelled orders can be reviewed for refund.");
+        }
+        if (order.getPaymentStatus() != PaymentStatus.SUCCESS) {
+            throw new IllegalStateException("Only successful payments can be refunded.");
+        }
+
+        if (approve) {
+            // TODO: real payment gateway refund call goes here before
+            // committing this status change.
+            order.setPaymentStatus(PaymentStatus.REFUNDED);
+        }
+        // TODO: persist `reason` to an audit/refund-log table once one
+        // exists — currently not stored anywhere on the Order entity.
+
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepo.save(order);
+
+        return orderAdapter.mapToGetOrderResponseDTO(order);
     }
 }

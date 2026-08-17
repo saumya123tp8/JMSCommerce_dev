@@ -3,8 +3,6 @@ package com.example.JMSCommerce.Adapters;
 import com.example.JMSCommerce.DTOs.product.*;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Model.ProductSpecificationValue;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -39,13 +37,13 @@ public class ProductAdapter {
         return ProductResponseDTO.builder()
                 .name(entity.getName())
                 .shortDescription(entity.getShortDescription())
-//                .mrp(entity.getMrp())
+                .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
                 .brandName(entity.getBrand()!=null?entity.getBrand().getName():"")
                 .currency(entity.getCurrency())
                 .rating(entity.getRating())
-//                .sellingPrice(entity.getSellingPrice())
+                .sellingPrice(entity.getSellingPrice())
                 .status(entity.getStatus())
                 .currency(entity.getCurrency())
                 .inventoryType(entity.getInventoryType())

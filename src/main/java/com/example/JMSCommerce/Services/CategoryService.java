@@ -142,6 +142,9 @@ public class CategoryService {
 
         category.setParent(parent);
 
+        if(parent!=null) {
+            category.setLevel(parent.getLevel() + 1);
+        }
         category = categoryRepo
                 .save(category);
 

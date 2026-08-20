@@ -105,7 +105,7 @@ public class AuthController {
             throw new BadCredentialsCustomException("Invalid refresh token type");
         }
         String jti=jwtService.getJti(fetchedRefreshToken);
-        UUID userId=jwtService.getUserId(fetchedRefreshToken);
+
         //fetch old stored refresh token
         RefreshToken storedRefreshToken=refreshTokenRepo.findByJti(jti).orElseThrow(()->new BadCredentialsCustomException("Invalid refresh token"));
         if(storedRefreshToken.isRevoked()){
@@ -114,8 +114,12 @@ public class AuthController {
         if(storedRefreshToken.getExpiresAt().isBefore(Instant.now())){
             throw new BadCredentialsCustomException("Refresh token expired");
         }
-
-        if(!storedRefreshToken.getUser().getId().equals(userId)){
+//        UUID userId=jwtService.getUserId(fetchedRefreshToken);
+//        if(!storedRefreshToken.getUser().getId().equals(userId)){
+//            throw new BadCredentialsCustomException("Refresh token does not belong to this user");
+//        }
+        String userEmail=jwtService.getUserEmail(fetchedRefreshToken);
+        if(!storedRefreshToken.getUser().getEmail().equals(userEmail)){
             throw new BadCredentialsCustomException("Refresh token does not belong to this user");
         }
 

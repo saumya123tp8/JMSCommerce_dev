@@ -69,5 +69,7 @@ public class OrderItem extends BaseEntity{
 
     private String productName;
 
+    private Boolean inventoryReserved;
+
     // also we save snapshot of customization in OrderItemCustomization
 }

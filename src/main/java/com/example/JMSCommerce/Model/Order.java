@@ -1,5 +1,6 @@
 package com.example.JMSCommerce.Model;
 
+import com.example.JMSCommerce.Utility.enums.CurrencyType;
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
 import com.example.JMSCommerce.Utility.enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -36,6 +37,14 @@ public class Order extends BaseEntity{
     @Column(nullable = false)
     private OrderStatus status;
 
+    @OneToOne(
+            mappedBy = "order",
+            fetch = FetchType.LAZY
+    )
+    private Payment payment;
+
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
@@ -54,6 +63,10 @@ public class Order extends BaseEntity{
 
     @Column(nullable = false)
     private BigDecimal grandTotal;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private CurrencyType currency = CurrencyType.INR;
 
     @OneToOne(
             cascade = CascadeType.ALL,

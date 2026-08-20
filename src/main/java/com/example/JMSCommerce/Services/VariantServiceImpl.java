@@ -11,6 +11,7 @@ import com.example.JMSCommerce.Repositories.ProductVariantRepository;
 import com.example.JMSCommerce.Repositories.SpecificationDefinitionRepository;
 import com.example.JMSCommerce.Utility.ProductHelper;
 import com.example.JMSCommerce.Utility.VariantHelper;
+import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import com.example.JMSCommerce.Utility.validation.VariantValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,9 @@ public class VariantServiceImpl
         // 7. Save
 
 //        Product saved =
+        product.setStatus(
+                ProductStatus.ACTIVE
+        );
         productRepository.save(product);
 
         // 9. Return Created Variant

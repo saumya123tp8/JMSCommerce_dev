@@ -2,23 +2,12 @@ package com.example.JMSCommerce.Utility.enums;
 
 import java.util.EnumSet;
 import java.util.Set;
-
 public enum OrderStatus {
 
-    // Define allowed next states for each status
-    DELIVERED, // Terminal state (no further updates allowed)
-
-    SHIPPED {
+    PENDING {
         @Override
         public Set<OrderStatus> nextStates() {
-            return EnumSet.of(DELIVERED, CANCELLED);
-        }
-    },
-
-    PROCESSING {
-        @Override
-        public Set<OrderStatus> nextStates() {
-            return EnumSet.of(SHIPPED, CANCELLED);
+            return EnumSet.of(CONFIRMED, CANCELLED);
         }
     },
 
@@ -29,21 +18,28 @@ public enum OrderStatus {
         }
     },
 
-    PENDING {
+    PROCESSING {
         @Override
         public Set<OrderStatus> nextStates() {
-            return EnumSet.of(CONFIRMED, CANCELLED);
+            return EnumSet.of(SHIPPED, CANCELLED);
         }
     },
 
-    CANCELLED; // Terminal status
+    SHIPPED {
+        @Override
+        public Set<OrderStatus> nextStates() {
+            return EnumSet.of(DELIVERED);
+        }
+    },
 
-    // Default implementation returns an empty set (terminal state)
+    DELIVERED,
+    CANCELLED,
+    PAYMENT_FAILED;
+
     public Set<OrderStatus> nextStates() {
         return EnumSet.noneOf(OrderStatus.class);
     }
 
-    // Validation helper
     public boolean canTransitionTo(OrderStatus targetStatus) {
         return nextStates().contains(targetStatus);
     }

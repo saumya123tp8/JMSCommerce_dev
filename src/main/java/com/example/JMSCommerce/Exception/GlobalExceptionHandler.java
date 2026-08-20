@@ -2,7 +2,6 @@ package com.example.JMSCommerce.Exception;
 
 import com.example.JMSCommerce.Utility.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -108,6 +107,20 @@ public class GlobalExceptionHandler {
                                 request.getRequestURI()
                         )
                 );
+    }
+
+    @ExceptionHandler(PaymentGatewayException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePaymentGatewayException(
+            PaymentGatewayException ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error(
+                        "PAYMENT_GATEWAY_ERROR",
+                        ex.getMessage(),
+                        null
+                ));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

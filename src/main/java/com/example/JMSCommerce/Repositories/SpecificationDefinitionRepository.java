@@ -15,4 +15,5 @@ public interface SpecificationDefinitionRepository
     boolean existsByCategoryAndNameIgnoreCase(Category category, String name);
     boolean existsByCategoryAndNameIgnoreCaseAndIdNot(Category category, String name, Long specificationId);
 
+    List<SpecificationDefinition> findByCategory_IdIn(List<Long> listCategoryId);
 }

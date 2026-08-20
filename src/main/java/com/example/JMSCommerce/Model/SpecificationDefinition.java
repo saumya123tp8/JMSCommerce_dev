@@ -1,7 +1,6 @@
 package com.example.JMSCommerce.Model;
 
-import com.example.JMSCommerce.Model.BaseEntity;
-import com.example.JMSCommerce.Model.Category;
+import com.example.JMSCommerce.Utility.enums.DefinitionType;
 import com.example.JMSCommerce.Utility.enums.SpecificationDataType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +36,10 @@ public class SpecificationDefinition extends BaseEntity {
     private String placeholder;
 
     private String defaultValue;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DefinitionType definitionType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.example.JMSCommerce.DTOs.specificationDefinition;
 
+import com.example.JMSCommerce.Utility.enums.DefinitionType;
 import com.example.JMSCommerce.Utility.enums.SpecificationDataType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,9 @@ public class CreateSpecificationDefinitionRequestDTO {
     @NotBlank(message = "Display name is required.")
     @Size(max = 150)
     private String displayName;
+
+    @NotNull(message = "Definition of Type required.")
+    private DefinitionType definitionType;
 
     @Size(max = 500)
     private String description;

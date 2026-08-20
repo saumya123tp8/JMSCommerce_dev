@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -180,4 +182,39 @@ public class SpecificationDefinitionService {
                 : name.trim().replaceAll("\\s+", " ");
     }
 
+    public List<SpecificationDefinitionResponseDTO> getSpecificationByCategoryId(Long id) {
+        List<Long> listCategoryId = findAllParentCategoryId(id);
+        return specificationRepository.findByCategory_IdIn(listCategoryId).stream().map(
+                specificationDefinition -> specificationAdapter.toDTO(specificationDefinition)
+        ).collect(Collectors.toList());
+    }
+    private List<Long> findAllParentCategoryId(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category with id " + categoryId + " not found"
+                        )
+                );
+
+        List<Long> categoryIds = new ArrayList<>();
+
+        collectCategoryIds(category, categoryIds);
+
+        return categoryIds;
+    }
+
+    private void collectCategoryIds(Category category, List<Long> categoryIds) {
+        categoryIds.add(category.getId());
+
+        if (category.getParent() == null) {
+            return;
+        }
+        Category parCategory = categoryRepository.findById(category.getParent().getId()).orElseThrow(
+                ()-> new ResourceNotFoundException(
+                        "Category with id " + category.getParent().getId() + " not found"
+                )
+        );
+        collectCategoryIds(parCategory,categoryIds);
+
+    }
 }

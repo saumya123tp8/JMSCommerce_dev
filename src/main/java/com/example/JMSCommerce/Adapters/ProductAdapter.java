@@ -11,25 +11,35 @@ import org.springframework.stereotype.Component;
 public class ProductAdapter {
     public ProductResponseDetailsDTO mapProductToResponseDetailsDTO(Product entity){
         return ProductResponseDetailsDTO.builder()
-                .name(entity.getName())
+
                 .description(entity.getDescription())
-//                .mrp(entity.getMrp())
+
+                .primaryImage(entity.getPrimaryImage())
+                .name(entity.getName())
+                .shortDescription(entity.getShortDescription())
+                .mrp(entity.getMrp())
                 .primaryImage(entity.getPrimaryImage())
                 .rating(entity.getRating())
+                .sellingPrice(entity.getSellingPrice())
+                .status(entity.getStatus())
                 .currency(entity.getCurrency())
-//                .sellingPrice(entity.getSellingPrice())
+                .inventoryType(entity.getInventoryType())
+                .id(entity.getId())
                 .category(
                         CategorySummaryDTO.builder()
                                 .id(entity.getCategory().getId())
                                 .name(entity.getCategory().getName())
                                 .description(entity.getCategory().getDescription())
+                                .slug(entity.getCategory().getSlug())
                                 .build()
                 )
                 .brand(
-                        BrandSummaryDTO.builder()
+                        entity.getBrand() != null
+                                ? BrandSummaryDTO.builder()
                                 .id(entity.getBrand().getId())
                                 .name(entity.getBrand().getName())
                                 .build()
+                                : null
                 )
                 .build();
     }

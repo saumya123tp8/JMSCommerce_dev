@@ -5,16 +5,13 @@ import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
 import com.example.JMSCommerce.DTOs.product.ProductSpecificationResponseDTO;
-import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
 import com.example.JMSCommerce.Utility.enums.ProductStatus;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -82,7 +79,7 @@ public class ProductController {
 
     @GetMapping("/search")
     @PermitAll
-    private ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(@RequestParam("categoryName") Long category_id){
+    public ResponseEntity<ApiResponse<List<ProductResponseDetailsDTO>>> getProductByCategory(@RequestParam("categoryName") Long category_id){
         return ResponseEntity.ok(ApiResponse.success(productService.getProductByCategory(category_id), "Product Details Fetched Successfully"));
     }
 

@@ -24,6 +24,7 @@ public class SpecificationDefinitionAdapter {
                   .placeholder(dto.getPlaceholder())
                   .required(dto.getRequired())
                   .searchable(dto.getSearchable())
+                  .definitionType(dto.getDefinitionType())
                   .build();
     }
 
@@ -45,6 +46,7 @@ public class SpecificationDefinitionAdapter {
                 .searchable(entity.getSearchable())
                 .categoryName(entity.getCategory().getName())
                 .categoryId(entity.getCategory().getId())
+                .definitionType(entity.getDefinitionType())
                 .build();
     }
 

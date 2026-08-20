@@ -9,10 +9,7 @@ import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationVal
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.*;
-import com.example.JMSCommerce.Repositories.BrandRepo;
-import com.example.JMSCommerce.Repositories.ProductRepo;
-import com.example.JMSCommerce.Repositories.ProductSpecificationRepository;
-import com.example.JMSCommerce.Repositories.SpecificationDefinitionRepository;
+import com.example.JMSCommerce.Repositories.*;
 import com.example.JMSCommerce.Utility.ProductHelper;
 import com.example.JMSCommerce.Utility.SlugUtil;
 import com.example.JMSCommerce.Utility.enums.ProductStatus;
@@ -20,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +33,7 @@ public class ProductService {
     private final CategoryService categoryService;
     private final ProductAdapter productAdapter;
     private final ProductHelper productHelper;
+    private final CategoryRepo categoryRepo;
     private final ProductSpecificationRepository productSpecificationRepository;
     private final SpecificationDefinitionRepository specificationDefinitionRepository;
     //    public List<Product> getAllProducts() {
@@ -205,23 +204,57 @@ public class ProductService {
                         new ResourceNotFoundException(
                                 "Product with id " + id + " not found"));
 
-        productRepo.delete(product);
+
         return null;
     }
     //    public List<Product> getProductByCategory(String category) {
 //
 //        return productRepo.findByCategory(category);
 //    }
-    public List<ProductResponseDetailsDTO> getProductByCategory(Long category_id) {
-        List<ProductResponseDetailsDTO> productListWithGivenCategory =
-                productRepo.findByCategory_Id(category_id).stream().map(
-                      product->  productAdapter.mapProductToResponseDetailsDTO(product)
-                ).collect(Collectors.toList());
-        if (productListWithGivenCategory.isEmpty()) {
-            throw new ResourceNotFoundException("Product with Category" + category_id + " not found");
+    public List<ProductResponseDetailsDTO> getProductByCategory(Long categoryId) {
+
+        List<Long> categoryIds = findAllChildCategoryId(categoryId);
+
+        List<ProductResponseDetailsDTO> products =
+                productRepo.findByCategory_IdIn(categoryIds)
+                        .stream()
+                        .map(productAdapter::mapProductToResponseDetailsDTO)
+                        .toList();
+
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Product with Category " + categoryId + " not found"
+            );
         }
-        return productListWithGivenCategory;
-//        return productRepo.findByCategory(category_id);
+
+        return products;
+    }
+
+    private List<Long> findAllChildCategoryId(Long categoryId) {
+        Category category = categoryRepo.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category with id " + categoryId + " not found"
+                        )
+                );
+
+        List<Long> categoryIds = new ArrayList<>();
+
+        collectCategoryIds(category, categoryIds);
+
+        return categoryIds;
+    }
+
+    private void collectCategoryIds(Category category, List<Long> categoryIds) {
+        categoryIds.add(category.getId());
+
+        if (category.getChildren() == null) {
+            return;
+        }
+
+        for (Category child : category.getChildren()) {
+            collectCategoryIds(child, categoryIds);
+        }
     }
 
 //    public Product getProductByID(Long id) {

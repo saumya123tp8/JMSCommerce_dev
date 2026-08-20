@@ -39,6 +39,14 @@ public class SpecificationDefinitionController {
         return ResponseEntity.ok().body(ApiResponse.success(specificationDefinitionService.getSpecificationById(id),"get specification for this category"));
     }
 
+    @GetMapping("/by-category/{id}")
+    @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
+    public ResponseEntity<ApiResponse<List<SpecificationDefinitionResponseDTO>>> getSpecificationByCategoryId(
+            @PathVariable Long id
+    ){
+        return ResponseEntity.ok().body(ApiResponse.success(specificationDefinitionService.getSpecificationByCategoryId(id),"get specification for this category"));
+    }
+
     @GetMapping
     @PermitAll
     public ResponseEntity<ApiResponse<List<SpecificationDefinitionResponseDTO>>>

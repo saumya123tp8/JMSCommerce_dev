@@ -49,9 +49,8 @@ public class CustomizationValidator {
     ) {
         validateDuplicates(optionIds);
         validateMandotoryCustomizationPresent(variant.getProduct(),optionIds);
-        List<CustomizationOption> selectedOptions = customizationOptionRepository.findAllById(optionIds);
-
         if(optionIds!=null) {
+            List<CustomizationOption> selectedOptions = customizationOptionRepository.findAllById(optionIds);
             validateExistence(optionIds);
             validateOwnership(
                     variant.getProduct(),

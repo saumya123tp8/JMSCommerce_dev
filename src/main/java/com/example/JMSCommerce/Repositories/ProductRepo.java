@@ -52,4 +52,6 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
     List<Product> findAllByStatus(ProductStatus status);
 
     boolean existsByNameIgnoreCaseAndBrand_Id(String trim, Long id);
+
+    List<Product> findByCategory_IdIn(List<Long> categoryIds);
 }

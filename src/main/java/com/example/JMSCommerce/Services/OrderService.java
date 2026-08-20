@@ -17,9 +17,9 @@ import com.example.JMSCommerce.Services.cart.CartOwnerProvider;
 import com.example.JMSCommerce.Services.cart.CartRedisService;
 import com.example.JMSCommerce.Utility.SecurityUtils;
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
+import com.example.JMSCommerce.Utility.enums.PaymentMethod;
 import com.example.JMSCommerce.Utility.enums.PaymentStatus;
 import com.example.JMSCommerce.Utility.validation.CartValidator.StockValidator;
-import com.example.JMSCommerce.Utility.validation.ValidateStatusTransition;
 import com.example.JMSCommerce.Utility.validation.VariantValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private final InventoryService inventoryService;
+    private final PaymentRepository paymentRepository;
     private final OrderRepo orderRepo;
     private final UserRepo userRepo;
     private final OrderAdapter orderAdapter;
@@ -53,7 +55,6 @@ public class OrderService {
     private final CustomizationOptionRepository customizationOptionRepository;
     private final OrderItemCustomizationRepository orderItemCustomizationRepository;
 
-    private final ValidateStatusTransition validateStatusTransition;
     private final CartOwnerProvider cartOwnerProvider;
     // also need to give some filter eg. address , status( we have ),
 
@@ -263,10 +264,6 @@ public class OrderService {
                                 )
                         );
 
-        validateStatusTransition.validateStatus(
-                order.getStatus(),
-                request.getStatus()
-        );
 
         order.setStatus(
                 request.getStatus()
@@ -412,6 +409,10 @@ public class OrderService {
                     variant,
                     cartItem.getQuantity()
             );
+            inventoryService.reserve(
+                    variant.getId(),
+                    cartItem.getQuantity()
+            );
 
             customizationValidator.validateSelection(
                     variant,
@@ -508,11 +509,36 @@ public class OrderService {
                         .add(savedOrder.getDeliveryCharge())
         );
 
-        Order finalOrder =
-                orderRepo.save(savedOrder);
+        Payment payment = Payment.builder()
+                .order(savedOrder)
+                .method(placeOrderRequestDTO.getPaymentMethod())
+                .amount(savedOrder.getGrandTotal())
+                .currency(savedOrder.getCurrency())
+                .status(PaymentStatus.PENDING)
+                .build();
 
-        return orderAdapter
-                .mapToGetOrderResponseDTO(finalOrder);
+        paymentRepository.save(payment);
+
+        if (placeOrderRequestDTO.getPaymentMethod() == PaymentMethod.COD) {
+
+            savedOrder.setStatus(OrderStatus.CONFIRMED);
+            savedOrder.setPaymentStatus(PaymentStatus.PENDING);
+
+            // Payment Cash → cart can now be cleared
+            cartRedisService.deleteCart(
+                    ownerId
+            );
+
+        } else {
+
+            savedOrder.setStatus(OrderStatus.PENDING);
+            savedOrder.setPaymentStatus(PaymentStatus.PENDING);
+        }
+
+        Order finalOrder = orderRepo.save(savedOrder);
+
+        return orderAdapter.mapToGetOrderResponseDTO(finalOrder);
+
     }
 
     private BigDecimal calculateCustomizationPrice(List<Long> customizationOptionIds) {
@@ -653,6 +679,7 @@ public class OrderService {
         return orderAdapter
                 .mapToGetOrderResponseDTO(savedOrder);
     }
+
 
 
     @Transactional

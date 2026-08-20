@@ -1,6 +1,7 @@
 package com.example.JMSCommerce.DTOs.specificationDefinition;
 
 
+import com.example.JMSCommerce.Utility.enums.DefinitionType;
 import com.example.JMSCommerce.Utility.enums.SpecificationDataType;
 import lombok.*;
 
@@ -38,4 +39,6 @@ public class SpecificationDefinitionResponseDTO {
     private Long categoryId;
 
     private String categoryName;
+
+    private DefinitionType definitionType;
 }

@@ -17,7 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE product_variant SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLDelete(
+        sql = """
+        UPDATE product_variant
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND version = ?
+        """
+)
+//@SQLDelete(sql = "UPDATE product_variant SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class ProductVariant extends BaseEntity {
 

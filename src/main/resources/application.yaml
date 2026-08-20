@@ -69,3 +69,8 @@ app:
 product:
   utility:
     maxInheritValueForCategory: 4
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_TRrU2ALLeDRNvP}
+  key-secret: ${RAZORPAY_KEY_SECRET:e9YX6GkFMPuH5bhRahL16a7v}
+  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:9dd345ab53e022da74e0b11a91840a4d28682cb708610931fcc640bda420c311}

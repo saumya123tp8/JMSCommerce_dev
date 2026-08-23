@@ -602,6 +602,7 @@ public class OrderService {
     }
 
 
+    // tesing : mock
     @Transactional
     public GetOrderResponseDTO payOrder(
             Long orderId,
@@ -681,7 +682,7 @@ public class OrderService {
     }
 
 
-
+    // testing : mock
     @Transactional
     public GetOrderResponseDTO retryPayment(
             Long orderId,

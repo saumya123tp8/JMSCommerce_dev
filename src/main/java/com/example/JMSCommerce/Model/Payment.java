@@ -46,6 +46,7 @@ public class Payment extends BaseEntity {
     @Builder.Default
     private CurrencyType currency = CurrencyType.INR;
 
+//    @JoinColumn
     @OneToMany(
             mappedBy = "payment",
             cascade = CascadeType.ALL,

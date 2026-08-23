@@ -11,6 +11,8 @@ import com.example.JMSCommerce.Exception.PaymentGatewayException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Model.*;
 import com.example.JMSCommerce.Repositories.*;
+import com.example.JMSCommerce.Services.cart.CartOwnerProvider;
+import com.example.JMSCommerce.Services.cart.CartRedisService;
 import com.example.JMSCommerce.Utility.SecurityUtils;
 import com.example.JMSCommerce.Utility.enums.CurrencyType;
 import com.example.JMSCommerce.Utility.enums.OrderStatus;
@@ -18,6 +20,8 @@ import com.example.JMSCommerce.Utility.enums.PaymentMethod;
 import com.example.JMSCommerce.Utility.enums.PaymentStatus;
 import com.example.JMSCommerce.config.RazorpayProperties;
 import com.razorpay.RazorpayException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -42,7 +46,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepo userRepo;
     private final RazorpayProperties razorpayProperties;
     private final OrderItemRepo orderItemRepo;
-
+    private final CartOwnerProvider cartOwnerProvider;
+    private final CartRedisService cartRedisService;
+    @PersistenceContext
+    EntityManager entityManager;
     @Value("${razorpay.key-id}")
     private String razorpayKeyId;
 
@@ -84,6 +91,12 @@ public class PaymentServiceImpl implements PaymentService {
                                 .build()
                 );
 
+
+
+        payment.setStatus(PaymentStatus.INITIATING);
+
+        payment = paymentRepository.save(payment);
+        //due to cascade has some issue so I am managing it explicitly
         PaymentAttempt attempt = PaymentAttempt.builder()
                 .payment(payment)
                 .amount(order.getGrandTotal())
@@ -91,12 +104,12 @@ public class PaymentServiceImpl implements PaymentService {
                 .status(PaymentStatus.INITIATING)
                 .initiatedAt(LocalDateTime.now())
                 .build();
-
         payment.addAttempt(attempt);
-        payment.setStatus(PaymentStatus.INITIATING);
+        System.out.println("Payment managed: "
+                + entityManager.contains(payment));
 
-        payment = paymentRepository.save(payment);
-
+        System.out.println("Attempt managed: "
+                + entityManager.contains(attempt));
         try {
 
             RazorpayOrderResponse razorpayOrder =
@@ -113,11 +126,14 @@ public class PaymentServiceImpl implements PaymentService {
             attempt.setStatus(
                     PaymentStatus.INITIATED
             );
-
+            System.out.println("Attempt managed after update: "
+                    + entityManager.contains(attempt));
             payment.setStatus(
                     PaymentStatus.INITIATED
             );
-
+            // Explicitly persist attempt( while saving payment can save payment_attempt due to cascade type all )
+            paymentAttemptRepository.save(attempt);
+//            paymentAttemptRepository.save(attempt);
             paymentRepository.save(payment);
 
             return PaymentInitiationResponseDTO.builder()
@@ -154,6 +170,8 @@ public class PaymentServiceImpl implements PaymentService {
                     PaymentStatus.FAILED
             );
 
+            // Explicitly persist attempt( while saving payment can save payment_attempt due to cascade type all )
+            paymentAttemptRepository.save(attempt);
             paymentRepository.save(payment);
             log.error("Razorpay order creation failed", e);
             throw new PaymentGatewayException(
@@ -288,6 +306,13 @@ public class PaymentServiceImpl implements PaymentService {
 
         order.setStatus(
                 OrderStatus.CONFIRMED
+        );
+
+        // clear cart here after success
+        // Payment succeeded → cart can now be cleared
+        String ownerId = cartOwnerProvider.getOwnerId();
+        cartRedisService.deleteCart(
+                ownerId
         );
 
         paymentAttemptRepository.save(attempt);

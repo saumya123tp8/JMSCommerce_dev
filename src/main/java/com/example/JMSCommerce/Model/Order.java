@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -87,5 +89,11 @@ public class Order extends BaseEntity{
     @Column(nullable = false, unique = true)
     private String orderNumber;
 
+    @OneToMany(
+            mappedBy = "order",
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<OrderReport> reports = new ArrayList<>();
 
 }

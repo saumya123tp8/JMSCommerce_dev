@@ -113,6 +113,7 @@ public class OrderAdapter {
                         .toList();
 
         return OrderItemResponseDTO.builder()
+                .orderItemId(orderItem.getId())
                 .productId(
                         variant.getProduct().getId()
                 )

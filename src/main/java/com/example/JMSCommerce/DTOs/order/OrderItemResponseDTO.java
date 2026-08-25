@@ -12,6 +12,8 @@ import java.util.List;
 @Builder
 public class OrderItemResponseDTO {
 
+    private Long orderItemId;
+
     private Long productId;
 
     private Long variantId;

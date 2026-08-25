@@ -5,6 +5,7 @@ import com.example.JMSCommerce.DTOs.review.ReviewResponseDTO;
 import com.example.JMSCommerce.DTOs.review.UpdateReviewRequestDTO;
 import com.example.JMSCommerce.Services.ReviewService;
 import com.example.JMSCommerce.Utility.ApiResponse;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,7 @@ public class ReviewController {
     }
 
     @GetMapping("/products/{productId}/reviews")
+    @PermitAll
     public ResponseEntity<ApiResponse<List<ReviewResponseDTO>>> getReviews(
             @PathVariable Long productId
     ) {

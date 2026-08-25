@@ -5,16 +5,9 @@ import com.example.JMSCommerce.Adapters.ReviewAdapter;
 import com.example.JMSCommerce.DTOs.review.CreateReviewRequestDTO;
 import com.example.JMSCommerce.DTOs.review.ReviewResponseDTO;
 import com.example.JMSCommerce.DTOs.review.UpdateReviewRequestDTO;
-import com.example.JMSCommerce.Exception.AccessDeniedException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
-import com.example.JMSCommerce.Model.OrderItem;
-import com.example.JMSCommerce.Model.Product;
-import com.example.JMSCommerce.Model.Review;
-import com.example.JMSCommerce.Model.User;
-import com.example.JMSCommerce.Repositories.OrderItemRepo;
-import com.example.JMSCommerce.Repositories.ProductRepo;
-import com.example.JMSCommerce.Repositories.ReviewRepository;
-import com.example.JMSCommerce.Repositories.UserRepo;
+import com.example.JMSCommerce.Model.*;
+import com.example.JMSCommerce.Repositories.*;
 import com.example.JMSCommerce.Utility.ProductHelper;
 import com.example.JMSCommerce.Utility.SecurityUtils;
 import com.example.JMSCommerce.Utility.enums.ReviewStatus;
@@ -34,6 +27,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final OrderItemRepo orderItemRepo;
     private final ProductRepo productRepository;
+    private final OrderRepo orderRepo;
 
     private final ReviewAdapter reviewAdapter;
     private final ReviewValidator reviewValidator;
@@ -75,7 +69,7 @@ public class ReviewService {
                 );
 
         return reviewRepository
-                .findByOrderItem_Variant_IdAndStatus(
+                .findByOrderItem_Variant_Product_IdAndStatus(
                         product.getId(),
                         ReviewStatus.ACTIVE
                 )
@@ -98,10 +92,19 @@ public class ReviewService {
                 orderId,
                 orderItemId
         );
-        User currentUser = getCurrentUserId();
-        if (!orderItem.getOrder().getUser().getId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("Access Denied");
-        }
+//        User currentUser = getCurrentUserId();
+        String currentUserMail =
+                SecurityUtils.getCurrentUserMail();
+        Order order =
+                orderRepo.findByIdAndUser_email(
+                                orderId,
+                                currentUserMail
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found"
+                                )
+                        );
 
         reviewValidator.validateCreate(
                 orderItem,

@@ -21,4 +21,9 @@ public interface ReviewRepository
             ReviewStatus status
     );
 
+    List<Review> findByOrderItem_Variant_Product_IdAndStatus(
+            Long productId,
+            ReviewStatus status
+    );
+
 }

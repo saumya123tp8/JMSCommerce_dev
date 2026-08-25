@@ -16,7 +16,7 @@ import lombok.*;
         name = "review",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = "order_product_id"
+                        columnNames = "order_item_id"
                 )
         }
 )

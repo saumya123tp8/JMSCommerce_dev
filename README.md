@@ -1,3 +1,4 @@
+Check out the frontend codebase at <a href="https://github.com/saumya123tp8/JMSCommerce_Dev_UI" target="_blank" rel="noopener noreferrer">saumya123tp8/JMSCommerce_Dev_UI</a>.
 # JMSCommerce
 
 Full-stack e-commerce platform built with **Java, Spring Boot, Spring Security, JPA/Hibernate, MySQL, Redis, React, Flyway and Razorpay**.

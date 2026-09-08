@@ -3,10 +3,11 @@ package com.example.JMSCommerce.DTOs.product;
 import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationValueDTO;
 import com.example.JMSCommerce.Utility.enums.CurrencyType;
 import com.example.JMSCommerce.Utility.enums.InventoryType;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -73,5 +74,6 @@ public class ProductCreateDTO {
 
     private List<ProductSpecificationValueDTO> specifications;
 
+    @Builder.Default
     private InventoryType inventoryType = InventoryType.FINITE;
 }

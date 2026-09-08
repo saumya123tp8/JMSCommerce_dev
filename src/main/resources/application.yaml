@@ -1,4 +1,8 @@
 spring:
+  docker:
+    compose:
+      enabled: false
+      file: docker-compose.yml
   application:
     name: databasePractice
   datasource:
@@ -70,7 +74,46 @@ product:
   utility:
     maxInheritValueForCategory: 4
 
+
 razorpay:
   key-id: ${RAZORPAY_KEY_ID:rzp_test_TRrU2ALLeDRNvP}
   key-secret: ${RAZORPAY_KEY_SECRET:e9YX6GkFMPuH5bhRahL16a7v}
   webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:9dd345ab53e022da74e0b11a91840a4d28682cb708610931fcc640bda420c311}
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 10s
+        histogram-flavor: explicit-bucket-histogram
+  opentelemetry:
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+  tracing:
+    export:
+      enabled: true
+    sampling:
+      probability: 1.0
+
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  endpoint:
+    health:
+      show-details: always
+
+
+server:
+  shutdown: immediate

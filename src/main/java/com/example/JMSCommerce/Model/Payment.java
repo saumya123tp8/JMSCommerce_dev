@@ -42,6 +42,7 @@ public class Payment extends BaseEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private CurrencyType currency = CurrencyType.INR;

@@ -18,8 +18,8 @@ spring:
         ttl-days: ${REDIS_TTL_DAYS:30}
   jpa:
     hibernate:
-      ddl-auto: update
-#       ddl-auto: validate #shifting to flyway migration now change in schema will not directly affect the table
+#      ddl-auto: update
+       ddl-auto: validate #shifting to flyway migration now change in schema will not directly affect the table
     show-sql: true
 
   flyway:

@@ -66,6 +66,7 @@ public class Order extends BaseEntity{
     @Column(nullable = false)
     private BigDecimal grandTotal;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private CurrencyType currency = CurrencyType.INR;

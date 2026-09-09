@@ -2,13 +2,11 @@ package com.example.JMSCommerce.Controller;
 
 
 import com.example.JMSCommerce.DTOs.UserDTO;
-import com.example.JMSCommerce.Model.User;
 import com.example.JMSCommerce.Services.UserService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +34,7 @@ public class UserController {
     }
 
     @PostMapping
+//    @PermitAll
     @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
     public ResponseEntity<ApiResponse<UserDTO>> createUser(UserDTO userDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userService.createUser(userDTO),"User Created Successfully"));

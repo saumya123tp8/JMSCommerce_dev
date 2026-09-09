@@ -117,3 +117,4 @@ razorpay:
 
 server:
   shutdown: immediate
+  port: ${SERVER_PORT:8081}

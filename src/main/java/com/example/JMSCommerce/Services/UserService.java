@@ -47,6 +47,7 @@ public class UserService {
 //        userRepo.save(user);
 //        return modelMapper.map(user,UserDTO.class);
         System.out.println(userDto.getName());
+        System.out.println(userDto.getEmail());
         if(userDto.getEmail()==null||userDto.getEmail().isBlank()){
             throw new CompulsoryDataMissingException("Email is required");
         }
@@ -60,7 +61,8 @@ public class UserService {
         //role assign to new user for authorization
         //TODO
 
-        Role role = roleRepository.findByName("ROLE_"+ AppConstants.GUEST_ROLE).orElse(null);
+//        Role role = roleRepository.findByName("ROLE_"+ AppConstants.GUEST_ROLE).orElse(null);
+        Role role = roleRepository.findByName("ROLE_"+ AppConstants.DEVELOPER_ROLE).orElse(null);
         if (user.getRoles() == null) {// because we are using builder annotation
             user.setRoles(new HashSet<>());
         }

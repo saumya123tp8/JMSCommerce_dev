@@ -1,0 +1,23 @@
+services:
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - jmscommerce-network
+
+  jmscommerce-app:
+    image: jmscommerce/jmscommerce:latest
+    container_name: jmscommerce-app
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    networks:
+      - jmscommerce-network
+    depends_on:
+      - redis
+
+networks:
+  jmscommerce-network:
+    driver: bridge

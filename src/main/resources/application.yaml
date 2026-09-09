@@ -6,16 +6,16 @@ spring:
   application:
     name: databasePractice
   datasource:
-    url: jdbc:mysql://localhost:3306/practice_springjpa
-    username: root
-    password: Skuk13579@
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/practice_springjpa}
+    username: ${DATABASE_USER_NAME:root}
+    password: ${DATABASE_PASSWORD:Skuk13579@}
   data:
     redis:
-      host: localhost
-      port: 6379
-      timeout: 60000
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:60000}
       cart:
-        ttl-days: 30
+        ttl-days: ${REDIS_TTL_DAYS:30}
   jpa:
     hibernate:
       ddl-auto: update
@@ -65,11 +65,11 @@ security:
 #  o ath2 configuration
 app:
   cors:
-    frontend_url: http://localhost:5173/
+    frontend_url: ${CORS_FRONTEND_URL:http://localhost:5173/}
   auth:
     frontend:
-      success_url: http://localhost:5173/oauth/success
-      fail_url: http://localhost:5173/oauth/fail
+      success_url: ${CORS_FRONTEND_SUCCESS:http://localhost:5173/oauth/success}
+      fail_url: ${CORS_FRONTEND_FAIL:http://localhost:5173/oauth/fail}
 product:
   utility:
     maxInheritValueForCategory: 4
@@ -80,40 +80,40 @@ razorpay:
   key-secret: ${RAZORPAY_KEY_SECRET:e9YX6GkFMPuH5bhRahL16a7v}
   webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:9dd345ab53e022da74e0b11a91840a4d28682cb708610931fcc640bda420c311}
 
-management:
-  otlp:
-    metrics:
-      export:
-        url: http://localhost:4318/v1/metrics
-        step: 10s
-        histogram-flavor: explicit-bucket-histogram
-  opentelemetry:
-    logging:
-      export:
-        otlp:
-          endpoint: http://localhost:4318/v1/logs
-    tracing:
-      export:
-        otlp:
-          endpoint: http://localhost:4318/v1/traces
-  tracing:
-    export:
-      enabled: true
-    sampling:
-      probability: 1.0
-
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, prometheus
-  metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true
-  endpoint:
-    health:
-      show-details: always
-
+#management:
+#  otlp:
+#    metrics:
+#      export:
+#        url: http://localhost:4318/v1/metrics
+#        step: 10s
+#        histogram-flavor: explicit-bucket-histogram
+#  opentelemetry:
+#    logging:
+#      export:
+#        otlp:
+#          endpoint: http://localhost:4318/v1/logs
+#    tracing:
+#      export:
+#        otlp:
+#          endpoint: http://localhost:4318/v1/traces
+#  tracing:
+#    export:
+#      enabled: true
+#    sampling:
+#      probability: 1.0
+#
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, metrics, prometheus
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        http.server.requests: true
+#  endpoint:
+#    health:
+#      show-details: always
+#
 
 server:
   shutdown: immediate

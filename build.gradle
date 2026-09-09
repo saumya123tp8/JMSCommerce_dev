@@ -18,12 +18,12 @@ repositories {
 }
 
 dependencies{
-	implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+//	implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
+//	implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
 	implementation 'org.springframework.boot:spring-boot-docker-compose:4.0.5'
-	implementation 'io.micrometer:micrometer-registry-prometheus:1.17.0-M3'
-	implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:2.21.0-alpha'
+//	implementation 'io.micrometer:micrometer-registry-prometheus:1.17.0-M3'
+//	implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:2.21.0-alpha'
 	// Source: https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
 	// docker compose so that that we do not need torun commad to up docker again and again
 	//spring boot actuator
@@ -64,5 +64,43 @@ tasks.named('test') {
 }
 
 tasks.named('bootRun') {
+
+	// Load variables from .env
+	def envFile = file('.env')
+
+	if (envFile.exists()) {
+		envFile.eachLine { line ->
+
+			def trimmed = line.trim()
+
+			// Ignore empty lines and comments
+			if (!trimmed || trimmed.startsWith('#')) {
+				return
+			}
+
+			// Find =
+			def separatorIndex = trimmed.indexOf('=')
+
+			if (separatorIndex > 0) {
+
+				def key = trimmed.substring(0, separatorIndex).trim()
+				def value = trimmed.substring(separatorIndex + 1).trim()
+
+				// Remove surrounding quotes
+				if ((value.startsWith('"') && value.endsWith('"')) ||
+						(value.startsWith("'") && value.endsWith("'"))) {
+
+					value = value.substring(1, value.length() - 1)
+				}
+
+				// Existing OS environment variables take priority
+				if (System.getenv(key) == null) {
+					environment key, value
+				}
+			}
+		}
+	}
+
+	// New Relic
 	jvmArgs = ['-javaagent:newrelic/newrelic.jar']
 }

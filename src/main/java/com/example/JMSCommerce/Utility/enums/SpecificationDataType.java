@@ -7,5 +7,6 @@ public enum SpecificationDataType {
     DATE,
     COLOR,
     DECIMAL,
+    ENUM,//need to check
 
 }

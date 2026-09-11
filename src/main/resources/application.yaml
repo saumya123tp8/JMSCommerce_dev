@@ -23,8 +23,8 @@ spring:
     show-sql: true
 
   flyway:
-    enable: true
-    location: classpath:db/migration
+    enabled: true
+    locations: classpath:db/migration
 
 
   security:
@@ -118,3 +118,4 @@ razorpay:
 server:
   shutdown: immediate
   port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework

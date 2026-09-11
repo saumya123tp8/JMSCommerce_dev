@@ -22,7 +22,7 @@ public final class SecurityUtils {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("authentication "+authentication);
+//        System.out.println("authentication "+authentication);
         String email = authentication.getPrincipal().toString();
         return email;
     }

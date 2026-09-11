@@ -39,7 +39,7 @@ public class JwtService {
          this.key=Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
          this.accessTokenSeconds = accessTokenSeconds;
-         System.out.println("access token time period : "+accessTokenSeconds);
+//         System.out.println("access token time period : "+accessTokenSeconds);
          this.refreshTokenSeconds = refreshTokenSeconds;
          this.issuer = issuer;
 
@@ -49,7 +49,7 @@ public class JwtService {
     public String generateAccessToken(User user) {
          Instant now = Instant.now();
          List<String> roles=user.getRoles()==null?List.of():user.getRoles().stream().map(Role::getName).toList();
-        System.out.println("access token time period- : "+accessTokenSeconds);
+//        System.out.println("access token time period- : "+accessTokenSeconds);
          return Jwts.builder()
                  .id(UUID.randomUUID().toString())
                  .subject(user.getEmail())
@@ -94,7 +94,7 @@ public class JwtService {
 
     public boolean isAccessToken(String token) {
          Claims c = parse(token).getPayload();
-         System.out.println("Claim c :"+c.toString());
+//         System.out.println("Claim c :"+c.toString());
          return "access".equals(c.get("typ"));
     }
     public boolean isRefreshToken(String token) {

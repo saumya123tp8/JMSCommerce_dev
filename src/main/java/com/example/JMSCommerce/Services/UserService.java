@@ -46,8 +46,8 @@ public class UserService {
 //                .build();
 //        userRepo.save(user);
 //        return modelMapper.map(user,UserDTO.class);
-        System.out.println(userDto.getName());
-        System.out.println(userDto.getEmail());
+//        System.out.println(userDto.getName());
+//        System.out.println(userDto.getEmail());
         if(userDto.getEmail()==null||userDto.getEmail().isBlank()){
             throw new CompulsoryDataMissingException("Email is required");
         }

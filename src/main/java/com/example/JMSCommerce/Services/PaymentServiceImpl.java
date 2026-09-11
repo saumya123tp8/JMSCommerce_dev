@@ -105,11 +105,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .initiatedAt(LocalDateTime.now())
                 .build();
         payment.addAttempt(attempt);
-        System.out.println("Payment managed: "
-                + entityManager.contains(payment));
-
-        System.out.println("Attempt managed: "
-                + entityManager.contains(attempt));
+//        System.out.println("Payment managed: "
+//                + entityManager.contains(payment));
+//
+//        System.out.println("Attempt managed: "
+//                + entityManager.contains(attempt));
         try {
 
             RazorpayOrderResponse razorpayOrder =

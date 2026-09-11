@@ -16,15 +16,15 @@ public class RazorpayClientConfig {
     public RazorpayClient razorpayClient()
             throws RazorpayException {
 
-        System.out.println(
-                "Razorpay Key ID = " + properties.getKeyId()
-        );
-
-        System.out.println(
-                "Razorpay Secret present = " +
-                        (properties.getKeySecret() != null &&
-                                !properties.getKeySecret().isBlank())
-        );
+//        System.out.println(
+//                "Razorpay Key ID = " + properties.getKeyId()
+//        );
+//
+//        System.out.println(
+//                "Razorpay Secret present = " +
+//                        (properties.getKeySecret() != null &&
+//                                !properties.getKeySecret().isBlank())
+//        );
 
 
         return new RazorpayClient(

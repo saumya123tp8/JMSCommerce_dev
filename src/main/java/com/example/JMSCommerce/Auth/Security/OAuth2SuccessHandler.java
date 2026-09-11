@@ -118,7 +118,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 String email = oAuth2User.getAttributes().getOrDefault("email","").toString();
                 String name = oAuth2User.getAttributes().getOrDefault("name","").toString();
                 String pictures = oAuth2User.getAttributes().getOrDefault("picture","").toString();
-                System.out.println("image"+pictures);
+//                System.out.println("image"+pictures);
                 User newUser = User.builder()
                         .email(email)
                         .name(name)
@@ -150,9 +150,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 String name = oAuth2User.getAttributes().get("name") != null
                         ? oAuth2User.getAttributes().get("name").toString()
                         : login;
-                System.out.println("image"+avatarUrl);
-                System.out.println("name"+name);
-                System.out.println("mail"+email);
+//                System.out.println("image"+avatarUrl);
+//                System.out.println("name"+name);
+//                System.out.println("mail"+email);
                 User newUser = User.builder()
                         .email(email)
                         .name(name)

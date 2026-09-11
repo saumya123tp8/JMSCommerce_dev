@@ -37,7 +37,7 @@ public class RazorpayServiceImpl implements RazorpayService {
         options.put("currency", currency);
         options.put("receipt", receipt);
 
-        System.out.println("Razorpay options: " + options);
+//        System.out.println("Razorpay options: " + options);
 
         Order razorpayOrder =
                 razorpayClient.orders.create(options);

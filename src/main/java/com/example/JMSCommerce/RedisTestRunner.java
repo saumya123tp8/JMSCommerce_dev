@@ -18,9 +18,9 @@ public class RedisTestRunner
         redisTemplate.opsForValue()
                 .set("hello", "redis");
 
-        System.out.println(
-                redisTemplate.opsForValue().get("hello")
-        );
+//        System.out.println(
+//                redisTemplate.opsForValue().get("hello")
+//        );
 
     }
 }

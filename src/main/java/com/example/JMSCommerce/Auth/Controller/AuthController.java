@@ -72,7 +72,7 @@ public class AuthController {
         cookieService.NoStoreHeader(response);
 
         TokenResponse tokenResponse=TokenResponse.of(accessToken,refreshToken,jwtService.getAccessTokenSeconds(),modelMapper.map(user, UserDTO.class));
-        System.out.println(tokenResponse);
+//        System.out.println(tokenResponse);
         return ResponseEntity.ok(ApiResponse.success(tokenResponse,"login successfully"));
 
     }

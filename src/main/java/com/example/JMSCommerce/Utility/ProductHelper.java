@@ -144,7 +144,7 @@ public class ProductHelper {
 
     public void validateSpecificationValue(SpecificationDefinition definition, ProductSpecificationValueDTO productSpecificationValueDTO) {
 
-        System.out.println(" def "+definition+" DTO "+productSpecificationValueDTO);
+//        System.out.println(" def "+definition+" DTO "+productSpecificationValueDTO);
         String value = productSpecificationValueDTO.getValue();
         switch (definition.getDataType()) {
 

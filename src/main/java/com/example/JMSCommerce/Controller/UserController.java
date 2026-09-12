@@ -2,17 +2,17 @@ package com.example.JMSCommerce.Controller;
 
 
 import com.example.JMSCommerce.DTOs.UserDTO;
+import com.example.JMSCommerce.DTOs.UserProfileDTO;
+import com.example.JMSCommerce.DTOs.UserProfileUpdateDTO;
 import com.example.JMSCommerce.Services.UserService;
 import com.example.JMSCommerce.Utility.ApiResponse;
 import com.example.JMSCommerce.Utility.AppConstants;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +31,24 @@ public class UserController {
             return ResponseEntity.ok(ApiResponse.success(List.of(),"No user existes"));
         }
         return ResponseEntity.ok(ApiResponse.success(userList.get(),"List of users"));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserProfileDTO>> updateLoginUsers(@RequestBody @Valid UserProfileUpdateDTO userProfileUpdateDTO){
+        UserProfileDTO user = userService.updateLoginUsers(userProfileUpdateDTO);
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.success(null,"No user existes"));
+        }
+        return ResponseEntity.ok(ApiResponse.success(user,"List of users"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserProfileDTO>> findLoginUsers(){
+        UserProfileDTO user = userService.findLoginUsers();
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.success(null,"No user existes"));
+        }
+        return ResponseEntity.ok(ApiResponse.success(user,"List of users"));
     }
 
     @PostMapping

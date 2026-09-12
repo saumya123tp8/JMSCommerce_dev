@@ -1,0 +1,120 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+      file: docker-compose.yml
+  application:
+    name: databasePractice
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/practice_springjpa}
+    username: ${DATABASE_USER_NAME:root}
+    password: ${DATABASE_PASSWORD:Skuk13579@}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:60000}
+      cart:
+        ttl-days: ${REDIS_TTL_DAYS:30}
+  jpa:
+    hibernate:
+            ddl-auto: update
+    show-sql: true
+
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:test-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:test-client-secret}
+            scope:
+              - email
+              - profile
+              - openid
+          github:
+            client-id: ${GITHUB_CLIENT_ID:test-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:test-client-secret}
+            scope:
+              - user:email
+              - read:user
+  # /login/oauth2/code/google
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+security:
+  jwt:
+    #    keep jwt secret long otherwise it will cause errorn in creating beans, failed in constructor
+    secret: ${JWT_SECRET:buwfueunnin2984ygyjhvgyvyjhhbhvyctdtdtgyuyjgyugygyftydrdrtcthgvgjvgdjnjkn!*#njhb}
+    issuer: ${JWT_ISSUER:api.substring.com}
+    access-ttl-seconds: ${JWT_TTL:200000}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL:600000}
+    refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshTokenCookieName}
+    cookie-secure: ${JWT_COOKIE_SECURE:True}
+    cookie-http-only: ${JWT_HTTP_COOKIE_ONLY:True}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    refresh-token-cookie-domain: ${JWT_REFRESH_COOKIE_domain:}
+#  o ath2 configuration
+app:
+  cors:
+    frontend_url: ${CORS_FRONTEND_URL:http://localhost:5173/}
+  auth:
+    frontend:
+      success_url: ${CORS_FRONTEND_SUCCESS:http://localhost:5173/oauth/success}
+      fail_url: ${CORS_FRONTEND_FAIL:http://localhost:5173/oauth/fail}
+product:
+  utility:
+    maxInheritValueForCategory: 4
+
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_TRrU2ALLeDRNvP}
+  key-secret: ${RAZORPAY_KEY_SECRET:e9YX6GkFMPuH5bhRahL16a7v}
+  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:9dd345ab53e022da74e0b11a91840a4d28682cb708610931fcc640bda420c311}
+
+#management:
+#  otlp:
+#    metrics:
+#      export:
+#        url: http://localhost:4318/v1/metrics
+#        step: 10s
+#        histogram-flavor: explicit-bucket-histogram
+#  opentelemetry:
+#    logging:
+#      export:
+#        otlp:
+#          endpoint: http://localhost:4318/v1/logs
+#    tracing:
+#      export:
+#        otlp:
+#          endpoint: http://localhost:4318/v1/traces
+#  tracing:
+#    export:
+#      enabled: true
+#    sampling:
+#      probability: 1.0
+#
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, metrics, prometheus
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        http.server.requests: true
+#  endpoint:
+#    health:
+#      show-details: always
+#
+
+server:
+  shutdown: immediate
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework

@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserProfileUpdateDTO {
+public class UserUpdateDTO {
 
     @Size(min = 2, max = 60, message = "Name must be between 2 and 60 characters")
     private String name;

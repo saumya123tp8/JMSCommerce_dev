@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN emailVerifiedAt DATETIME(6);
+ALTER TABLE users ADD COLUMN phoneVerifiedAt DATETIME(6);

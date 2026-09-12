@@ -1,4 +1,5 @@
 package com.example.JMSCommerce.Auth.Controller;
+
 import com.example.JMSCommerce.Auth.DTOs.LoginRequest;
 import com.example.JMSCommerce.Auth.DTOs.RefreshTokenRequest;
 import com.example.JMSCommerce.Auth.DTOs.TokenResponse;
@@ -7,7 +8,9 @@ import com.example.JMSCommerce.Auth.Repositoy.RefreshTokenRepo;
 import com.example.JMSCommerce.Auth.Security.CookieService;
 import com.example.JMSCommerce.Auth.Security.JwtService;
 import com.example.JMSCommerce.Auth.Service.AuthService;
+import com.example.JMSCommerce.Auth.Service.EmailVerificationService;
 import com.example.JMSCommerce.DTOs.UserDTO;
+import com.example.JMSCommerce.DTOs.UserResDTO;
 import com.example.JMSCommerce.Exception.BadCredentialsCustomException;
 import com.example.JMSCommerce.Model.User;
 import com.example.JMSCommerce.Repositories.UserRepo;
@@ -44,6 +47,7 @@ public class AuthController {
     private final ModelMapper modelMapper;
     private RefreshTokenRepo refreshTokenRepo;
     private final CookieService cookieService;
+    private final EmailVerificationService emailVerificationService;
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> loginUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {// it will generate token
         Authentication authentication=authenticate(loginRequest);
@@ -51,6 +55,12 @@ public class AuthController {
         if(!user.isEnabled()){
             throw new DisabledException("User is disabled");
         }
+        // let user login for now and at any important ste eg report I will ask to verify
+//        if (!user.isEmailVerified()) {
+//            throw new BadCredentialsCustomException(
+//                    "Please verify your email before logging in or try register again"
+//            );
+//        }
 
 
         //first save refresh tokens jti in table with all information
@@ -87,7 +97,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserDTO>> registerUser(@RequestBody UserDTO userDto) {
+    public ResponseEntity<ApiResponse<UserResDTO>> registerUser(@RequestBody UserDTO userDto) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(authService.registerUser(userDto), "User created succesfully"));
         } catch (Exception e) {
@@ -211,6 +221,18 @@ public class AuthController {
 
         return Optional.empty();
     }
+    @GetMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(
+            @RequestParam String token
+    ) {
+        emailVerificationService.verifyEmail(token);
 
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        "Email verified successfully"
+                )
+        );
+    }
 
 }

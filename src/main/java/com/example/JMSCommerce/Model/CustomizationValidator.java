@@ -20,18 +20,22 @@ import com.example.JMSCommerce.Exception.ResourceNotFoundException;
 import com.example.JMSCommerce.Repositories.CustomizationGroupRepository;
 import com.example.JMSCommerce.Repositories.CustomizationOptionRepository;
 import com.example.JMSCommerce.Utility.enums.SelectionType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class CustomizationValidator {
 
     private final CustomizationGroupRepository customizationGroupRepository;
     private final CustomizationOptionRepository customizationOptionRepository;
+
+    public CustomizationValidator(CustomizationGroupRepository customizationGroupRepository, CustomizationOptionRepository customizationOptionRepository) {
+
+        this.customizationGroupRepository = customizationGroupRepository;
+        this.customizationOptionRepository = customizationOptionRepository;
+    }
 
     // Admin side
     public void validateDefinition(CreateCustomizationRequestDTO request) {

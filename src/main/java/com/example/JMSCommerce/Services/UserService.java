@@ -1,9 +1,9 @@
 package com.example.JMSCommerce.Services;
 
-import com.example.JMSCommerce.DTOs.RoleDTO;
+import com.example.JMSCommerce.Adapters.UserAdapter;
 import com.example.JMSCommerce.DTOs.UserDTO;
-import com.example.JMSCommerce.DTOs.UserProfileDTO;
-import com.example.JMSCommerce.DTOs.UserProfileUpdateDTO;
+import com.example.JMSCommerce.DTOs.UserResDTO;
+import com.example.JMSCommerce.DTOs.UserUpdateDTO;
 import com.example.JMSCommerce.Exception.CompulsoryDataMissingException;
 import com.example.JMSCommerce.Exception.DuplicateRecordException;
 import com.example.JMSCommerce.Model.Role;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +30,7 @@ public class UserService {
     private final ModelMapper modelMapper;
 //    private final UserRepo userRepo;
     private final RoleRepository roleRepository;
+    private final UserAdapter userAdapter;
     public Optional<List<UserDTO>> findAllUsers() {
         List<UserDTO> users = userRepo.findAll()
                 .stream()
@@ -42,7 +42,7 @@ public class UserService {
                 : Optional.of(users);
     }
 
-    public UserDTO createUser(UserDTO userDto) {
+    public User createUser(UserDTO userDto) {
 
 //        User user = User.builder()
 //                .email(userDTO.getEmail())
@@ -75,20 +75,20 @@ public class UserService {
         user.getRoles().add(role);
         User savedUser=userRepo.save(user);
 
-        return modelMapper.map(savedUser, UserDTO.class);
+        return savedUser;
     }
 
-    public UserProfileDTO findLoginUsers() {
+    public UserResDTO findLoginUsers() {
         String currentUserMail =
                 SecurityUtils.getCurrentUserMail();
         User user = userRepo.findByEmail(currentUserMail).orElseThrow(()->new RuntimeException("Something wrong with user profile"));
 
-        return mapToUserProfileDTO(user);
+        return userAdapter.mapToUserResDTO(user);
 
     }
 
     @Transactional
-    public UserProfileDTO updateLoginUsers(UserProfileUpdateDTO req) {
+    public UserResDTO updateLoginUsers(UserUpdateDTO req) {
 
         String currentUserMail = SecurityUtils.getCurrentUserMail();
 
@@ -139,29 +139,10 @@ public class UserService {
 
         User savedUser = userRepo.save(user);
 
-        return mapToUserProfileDTO(savedUser);
+        return userAdapter.mapToUserResDTO(savedUser);
     }
-    private UserProfileDTO mapToUserProfileDTO(User user) {
 
-        return UserProfileDTO.builder()
-                .email(user.getEmail())
-                .age(user.getAge())
-                .phone(user.getPhone())
-                .image(user.getProfileImage())
-                .emailVerified(user.isEmailVerified())
-                .phoneVerified(user.isPhoneVerified())
-                .name(user.getName())
-                .provider(user.getProvider())
-                .roles(
-                        user.getRoles()
-                                .stream()
-                                .map(role ->
-                                        RoleDTO.builder()
-                                                .name(role.getName())
-                                                .build()
-                                )
-                                .collect(Collectors.toSet())
-                )
-                .build();
+    public UserResDTO createUserRes(UserDTO userDTO) {
+        return userAdapter.mapToUserResDTO(createUser(userDTO));
     }
 }

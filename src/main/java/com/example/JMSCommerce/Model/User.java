@@ -1,9 +1,9 @@
 package com.example.JMSCommerce.Model;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import com.example.JMSCommerce.Model.BaseEntity;
+
 import com.example.JMSCommerce.Utility.enums.Provider;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -53,8 +53,12 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     private boolean emailVerified = false;
 
+    private Instant emailVerifiedAt;
+
     @Builder.Default
     private boolean phoneVerified = false;
+
+    private Instant phoneVerifiedAt;
 
     @Builder.Default
     private boolean enabled = true;

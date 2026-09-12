@@ -118,3 +118,9 @@ server:
   shutdown: immediate
   port: ${SERVER_PORT:8081}
   forward-headers-strategy: framework
+
+#//email verification - RESEND service
+resend:
+  api-key: ${EMAIL_SERVICE_API_KEY:efegetgfvr}
+  from-email: ${SEND_EMAIL_FROM:noreply@jmscommerce.in}
+  base-url-email : http://localhost:5173/verify-email

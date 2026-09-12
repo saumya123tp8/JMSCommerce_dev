@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserProfileDTO {
+public class UserResDTO {
     private String email;
     private String name;
     private String image;

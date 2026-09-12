@@ -70,7 +70,7 @@ public class SecurityConfig {
                                         .requestMatchers("/api/v1/auth/refresh").permitAll()
 //                                        .requestMatchers("/api/v1/oauth2/**").permitAll()
                                         .requestMatchers("/api/v1/developer/**").hasRole("DEVELOPER")
-                                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                        .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN","DEVELOPER")
                                         .anyRequest().authenticated()
                 )
                 .logout(AbstractHttpConfigurer::disable)

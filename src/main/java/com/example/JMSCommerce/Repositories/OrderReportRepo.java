@@ -3,6 +3,7 @@ package com.example.JMSCommerce.Repositories;
 
 import com.example.JMSCommerce.Model.OrderReport;
 import com.example.JMSCommerce.Utility.enums.OrderReportStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -24,4 +25,10 @@ public interface OrderReportRepo
     );
 
     List<OrderReport> findByStatus(OrderReportStatus status);
+
+    @EntityGraph(attributePaths = {
+            "order",
+            "order.user"
+    })
+    List<OrderReport> findAll();
 }

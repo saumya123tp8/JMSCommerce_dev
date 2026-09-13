@@ -4,6 +4,7 @@ package com.example.JMSCommerce.Controller;
 import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
+import com.example.JMSCommerce.DTOs.product.ProductSearchResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductSpecificationResponseDTO;
 import com.example.JMSCommerce.Services.ProductService;
 import com.example.JMSCommerce.Utility.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -76,6 +78,36 @@ public class ProductController {
     }
 
 
+
+    /**
+     * New paginated search/filter endpoint. The legacy /search?categoryName=...
+     * endpoint below is intentionally preserved for existing clients.
+     */
+    @GetMapping("/search/filter")
+    @PermitAll
+    public ResponseEntity<ApiResponse<ProductSearchResponseDTO>> searchProducts(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long brandId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(defaultValue = "false") Boolean inStock,
+            @RequestParam(defaultValue = "false") Boolean sale,
+            @RequestParam(defaultValue = "relevance") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        productService.searchProducts(
+                                search, categoryId, brandId, minPrice, maxPrice,
+                                minRating, inStock, sale, sort, page, size
+                        ),
+                        "Products Fetched Successfully"
+                )
+        );
+    }
 
     @GetMapping("/search")
     @PermitAll

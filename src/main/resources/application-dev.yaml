@@ -18,7 +18,9 @@ spring:
         ttl-days: ${REDIS_TTL_DAYS:30}
   jpa:
     hibernate:
-            ddl-auto: update
+      ddl-auto: update
+#            ddl-auto: validate
+
     show-sql: true
 
   flyway:
@@ -118,6 +120,7 @@ server:
   shutdown: immediate
   port: ${SERVER_PORT:8081}
   forward-headers-strategy: framework
+  address: 0.0.0.0
 
 #//email verification - RESEND service
 resend:

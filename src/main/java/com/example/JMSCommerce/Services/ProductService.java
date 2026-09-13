@@ -5,6 +5,8 @@ import com.example.JMSCommerce.DTOs.product.ProductCreateDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDTO;
 import com.example.JMSCommerce.DTOs.product.ProductResponseDetailsDTO;
 import com.example.JMSCommerce.DTOs.product.ProductSpecificationResponseDTO;
+import com.example.JMSCommerce.DTOs.product.ProductSearchResponseDTO;
+import com.example.JMSCommerce.Specifications.ProductSpecification;
 import com.example.JMSCommerce.DTOs.productSpecification.ProductSpecificationValueDTO;
 import com.example.JMSCommerce.Exception.BadRequestException;
 import com.example.JMSCommerce.Exception.ResourceNotFoundException;
@@ -14,9 +16,15 @@ import com.example.JMSCommerce.Utility.ProductHelper;
 import com.example.JMSCommerce.Utility.SlugUtil;
 import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +52,112 @@ public class ProductService {
         List<ProductResponseDTO> listProducts = products.stream().map(product->productAdapter.mapProductToResponseDTO(product)
         ).collect(Collectors.toList());
         return listProducts;
+    }
+
+    /**
+     * Public, paginated product discovery endpoint. All filtering happens in
+     * the database so the frontend never needs to download the full catalog.
+     */
+    @Transactional(readOnly = true)
+    public ProductSearchResponseDTO searchProducts(
+            String search,
+            Long categoryId,
+            Long brandId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Double minRating,
+            Boolean inStock,
+            Boolean sale,
+            String sort,
+            int page,
+            int size
+    ) {
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new BadRequestException("minPrice cannot be greater than maxPrice");
+        }
+
+        if (minRating != null && (minRating < 0 || minRating > 5)) {
+            throw new BadRequestException("minRating must be between 0 and 5");
+        }
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        List<Long> categoryIds = null;
+        if (categoryId != null) {
+            categoryIds = findAllChildCategoryId(categoryId);
+        }
+
+        Specification<Product> specification = ProductSpecification.active();
+
+        if (search != null && !search.isBlank()) {
+            specification = specification.and(ProductSpecification.text(search));
+        }
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            specification = specification.and(ProductSpecification.categoryIds(categoryIds));
+        }
+
+        if (brandId != null) {
+            specification = specification.and(ProductSpecification.brandId(brandId));
+        }
+
+        if (minPrice != null) {
+            specification = specification.and(ProductSpecification.minPrice(minPrice));
+        }
+
+        if (maxPrice != null) {
+            specification = specification.and(ProductSpecification.maxPrice(maxPrice));
+        }
+
+        if (minRating != null) {
+            specification = specification.and(ProductSpecification.minRating(minRating));
+        }
+
+        if (inStock) {
+            specification = specification.and(ProductSpecification.inStock(inStock));
+        }
+
+        if (sale) {
+            specification = specification.and(ProductSpecification.saleOnly(sale));
+        }
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, buildProductSort(sort));
+        Page<Product> result = productRepo.findAll(specification, pageable);
+
+        return ProductSearchResponseDTO.builder()
+                .content(result.getContent().stream()
+                        .map(productAdapter::mapProductToResponseDetailsDTO)
+                        .toList())
+                .page(result.getNumber())
+                .size(result.getSize())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .first(result.isFirst())
+                .last(result.isLast())
+                .build();
+    }
+
+    private Sort buildProductSort(String sort) {
+        String normalized = sort == null || sort.isBlank()
+                ? "relevance"
+                : sort.trim().toLowerCase();
+
+        return switch (normalized) {
+            case "price_asc" -> Sort.by(Sort.Direction.ASC, "sellingPrice")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+            case "price_desc" -> Sort.by(Sort.Direction.DESC, "sellingPrice")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+            case "rating", "rating_desc" -> Sort.by(Sort.Direction.DESC, "rating")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+            case "name", "name_asc" -> Sort.by(Sort.Direction.ASC, "name")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+            case "newest" -> Sort.by(Sort.Direction.DESC, "id");
+            case "relevance" -> Sort.by(Sort.Direction.DESC, "id");
+            default -> throw new BadRequestException(
+                    "Unsupported sort. Use relevance, newest, price_asc, price_desc, rating_desc, or name_asc"
+            );
+        };
     }
 
     public List<ProductResponseDTO> getAllProductsByStatus( ProductStatus status) {

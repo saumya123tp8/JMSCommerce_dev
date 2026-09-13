@@ -3,6 +3,7 @@ package com.example.JMSCommerce.Repositories;
 import com.example.JMSCommerce.Model.Product;
 import com.example.JMSCommerce.Utility.enums.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepo extends JpaRepository<Product,Long> {
+public interface ProductRepo extends JpaRepository<Product,Long>, JpaSpecificationExecutor<Product> {
     //    List<Product> findByCategory(String category);
     //    Now I will search based upon category id
     List<Product>findByCategory_Id(Long category_id);

@@ -119,9 +119,12 @@ public class ReviewService {
         Review savedReview =
                 reviewRepository.save(review);
 
+        Product product =  orderItem.getVariant().getProduct();
         ratingSyncService.syncRating(
 //                orderItem.getProduct()
-                orderItem.getVariant().getProduct()
+               product,
+                review,
+                0
         );
 
         return reviewAdapter.toResponse(
@@ -148,7 +151,7 @@ public class ReviewService {
                                 new ResourceNotFoundException(
                                         "Review not found."
                                 ));
-
+        Integer oldRating = review.getRating();
         review.setRating(request.getRating());
         review.setTitle(request.getTitle());
         review.setReviewText(
@@ -157,10 +160,12 @@ public class ReviewService {
 
         Review saved =
                 reviewRepository.save(review);
-
+        Product product = orderItem.getVariant().getProduct();
         ratingSyncService.syncRating(
 //                orderItem.getProduct()
-                orderItem.getVariant().getProduct()
+                product,
+                saved,
+                oldRating
         );
 
         return reviewAdapter.toResponse(saved);
@@ -188,9 +193,11 @@ public class ReviewService {
 
         reviewRepository.delete(review);
 
-        ratingSyncService.syncRating(
+        Product product = orderItem.getVariant().getProduct();
+        ratingSyncService.syncDelRating(
 //                orderItem.getProduct()
-                orderItem.getVariant().getProduct()
+                product,
+                review
         );
     }
 

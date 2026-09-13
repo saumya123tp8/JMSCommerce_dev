@@ -8,4 +8,10 @@ public interface EmailService {
             String name,
             String verificationUrl
     );
+
+    void sendPasswordResetEmail(
+            String email,
+            String name,
+            String resetUrl
+    );
 }

@@ -110,5 +110,103 @@ public class ResendEmailService implements EmailService {
         }
     }
 
+    @Override
+    public void sendPasswordResetEmail(
+            String email,
+            String name,
+            String resetUrl
+    ) {
+
+        String url = "https://api.resend.com/emails";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        String html = """
+            <html>
+            <body>
+
+                <h2>Password Reset</h2>
+
+                <p>
+                    Hi %s,
+                </p>
+
+                <p>
+                    We received a request to reset your JMSCommerce password.
+                </p>
+
+                <p>
+                    Click the button below to create a new password:
+                </p>
+
+                <p>
+                    <a href="%s"
+                       style="
+                           display:inline-block;
+                           padding:12px 20px;
+                           background:#000;
+                           color:#fff;
+                           text-decoration:none;
+                           border-radius:6px;
+                       ">
+                        Reset Password
+                    </a>
+                </p>
+
+                <p>
+                    This link will expire in 30 minutes.
+                </p>
+
+                <p>
+                    If you did not request a password reset,
+                    you can safely ignore this email.
+                </p>
+
+                <p>
+                    Thanks,<br>
+                    JMSCommerce Team
+                </p>
+
+            </body>
+            </html>
+            """.formatted(name, resetUrl);
+
+        Map<String, Object> body = Map.of(
+                "from", fromEmail,
+                "to", new String[]{email},
+                "subject", "Reset your JMSCommerce password",
+                "html", html
+        );
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        try {
+
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(
+                            url,
+                            request,
+                            String.class
+                    );
+
+            System.out.println(
+                    "Password reset email response: "
+                            + response.getBody()
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Failed to send password reset email: "
+                            + e.getMessage()
+            );
+
+            throw e;
+        }
+    }
+
 
 }

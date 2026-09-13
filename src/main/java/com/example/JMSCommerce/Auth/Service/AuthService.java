@@ -25,7 +25,11 @@ public class AuthService {
 
         // 1. Check whether email is already registered
         User existingUser =
-                userRepo.findByEmail(userDto.getEmail()).orElseThrow(()->new DuplicateRecordException("Email is already taken"));
+                userRepo.findByEmail(userDto.getEmail()).orElse(null);
+
+        if (existingUser != null) {
+            throw new DuplicateRecordException("Email is already taken");
+        }
 //        if (existingUser != null) {
 
 //            // Email already verified

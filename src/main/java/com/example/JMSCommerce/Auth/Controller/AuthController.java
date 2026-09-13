@@ -1,14 +1,13 @@
 package com.example.JMSCommerce.Auth.Controller;
 
-import com.example.JMSCommerce.Auth.DTOs.LoginRequest;
-import com.example.JMSCommerce.Auth.DTOs.RefreshTokenRequest;
-import com.example.JMSCommerce.Auth.DTOs.TokenResponse;
+import com.example.JMSCommerce.Auth.DTOs.*;
 import com.example.JMSCommerce.Auth.Model.RefreshToken;
 import com.example.JMSCommerce.Auth.Repositoy.RefreshTokenRepo;
 import com.example.JMSCommerce.Auth.Security.CookieService;
 import com.example.JMSCommerce.Auth.Security.JwtService;
 import com.example.JMSCommerce.Auth.Service.AuthService;
 import com.example.JMSCommerce.Auth.Service.EmailVerificationService;
+import com.example.JMSCommerce.Auth.Service.PasswordResetService;
 import com.example.JMSCommerce.DTOs.UserDTO;
 import com.example.JMSCommerce.DTOs.UserResDTO;
 import com.example.JMSCommerce.Exception.BadCredentialsCustomException;
@@ -48,6 +47,7 @@ public class AuthController {
     private RefreshTokenRepo refreshTokenRepo;
     private final CookieService cookieService;
     private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> loginUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {// it will generate token
         Authentication authentication=authenticate(loginRequest);
@@ -98,11 +98,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResDTO>> registerUser(@RequestBody UserDTO userDto) {
-        try {
+//        try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(authService.registerUser(userDto), "User created succesfully"));
-        } catch (Exception e) {
-            throw new BadCredentialsCustomException("register data is not proper");
-        }
+//        } catch (Exception e) {
+//            throw new BadCredentialsCustomException("register data is not proper");
+//        }
     }
 
     //this end point will validate the refresh token first then return new access token and new refresh token
@@ -231,6 +231,41 @@ public class AuthController {
                 ApiResponse.success(
                         null,
                         "Email verified successfully"
+                )
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @RequestBody ForgotPasswordRequestDTO request
+    ) {
+
+        passwordResetService.forgotPassword(
+                request.getEmail()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        "If the email exists, a password reset link has been sent"
+                )
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @RequestBody ResetPasswordRequestDTO request
+    ) {
+
+        passwordResetService.resetPassword(
+                request.getToken(),
+                request.getNewPassword()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        "Password reset successfully"
                 )
         );
     }

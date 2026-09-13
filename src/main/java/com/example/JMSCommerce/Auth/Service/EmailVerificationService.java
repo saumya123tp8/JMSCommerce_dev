@@ -50,7 +50,7 @@ public class EmailVerificationService {
 
 
         String verificationUrl =
-                verificationBaseUrl+"?token="
+                verificationBaseUrl+"/verify-email?token="
                         + token;
 
         emailService.sendVerificationEmail(

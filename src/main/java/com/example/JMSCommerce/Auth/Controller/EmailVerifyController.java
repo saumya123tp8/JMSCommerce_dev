@@ -23,12 +23,16 @@ public class EmailVerifyController {
     @PostMapping("/reverify-email")
     public ResponseEntity<ApiResponse<Void>> sendVerificationCode() {//user can login with unverified mail and later can verify it
 
+//        try{
+            User user = userRepo.findByEmail(SecurityUtils.getCurrentUserMail()).orElseThrow(()->new BadCredentialsException("something wrong with logined user"));
+            emailVerificationService.sendVerificationEmail(user);
 
-        User user = userRepo.findByEmail(SecurityUtils.getCurrentUserMail()).orElseThrow(()->new BadCredentialsException("something wrong with logined user"));
-        emailVerificationService.sendVerificationEmail(user);
+            return ResponseEntity.ok(
+                    ApiResponse.success(null,"Email sent")
+            );
+//        }catch(error){
+//           throw new MethodArgumentTypeMismatchException(err);
+//        }
 
-        return ResponseEntity.ok(
-                ApiResponse.success(null,"Email sent")
-        );
     }
 }

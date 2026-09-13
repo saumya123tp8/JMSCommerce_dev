@@ -2,6 +2,7 @@ package com.example.JMSCommerce.Auth.Service;
 
 import com.example.JMSCommerce.Auth.Model.PasswordResetToken;
 import com.example.JMSCommerce.Auth.Repositoy.PasswordResetTokenRepository;
+import com.example.JMSCommerce.Auth.Repositoy.RefreshTokenRepo;
 import com.example.JMSCommerce.Model.User;
 import com.example.JMSCommerce.Repositories.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+
+    private final RefreshTokenRepo refreshTokenRepo;
 
     @Value("${resend.base-url-email}")
     private String verificationBaseUrl;
@@ -126,6 +129,8 @@ public class PasswordResetService {
 
         tokenRepository.save(resetToken);
         userRepo.save(user);
+
+        refreshTokenRepo.revokeAllByUserId(user.getId());
     }
 
     private String generateToken() {

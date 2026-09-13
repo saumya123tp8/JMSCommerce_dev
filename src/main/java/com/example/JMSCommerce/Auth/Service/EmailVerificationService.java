@@ -2,6 +2,7 @@ package com.example.JMSCommerce.Auth.Service;
 
 import com.example.JMSCommerce.Auth.Model.EmailVerificationToken;
 import com.example.JMSCommerce.Auth.Repositoy.EmailVerificationTokenRepository;
+import com.example.JMSCommerce.Exception.BadCredentialsCustomException;
 import com.example.JMSCommerce.Model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,7 +97,7 @@ public class EmailVerificationService {
     public void verifyEmail(String token) {
 
         if (token == null || token.isBlank()) {
-            throw new RuntimeException("Verification token is missing");
+            throw new BadCredentialsCustomException("Verification token is missing");
         }
 
         String tokenHash = hashToken(token);
@@ -104,19 +105,19 @@ public class EmailVerificationService {
         EmailVerificationToken verificationToken =
                 tokenRepository.findByTokenHash(tokenHash)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new BadCredentialsCustomException(
                                         "Invalid verification token"
                                 )
                         );
 
         if (verificationToken.getVerifiedAt() != null) {
-            throw new RuntimeException(
+            throw new BadCredentialsCustomException(
                     "Email is already verified"
             );
         }
 
         if (verificationToken.getExpiresAt().isBefore(Instant.now())) {
-            throw new RuntimeException(
+            throw new BadCredentialsCustomException(
                     "Verification token has expired"
             );
         }

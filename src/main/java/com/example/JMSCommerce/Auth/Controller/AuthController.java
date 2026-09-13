@@ -262,6 +262,7 @@ public class AuthController {
                 request.getNewPassword()
         );
 
+
         return ResponseEntity.ok(
                 ApiResponse.success(
                         null,

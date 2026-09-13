@@ -121,6 +121,6 @@ server:
 
 #//email verification - RESEND service
 resend:
-  api-key: ${EMAIL_SERVICE_API_KEY:efegetgfvr}
+  api-key: ${EMAIL_SERVICE_API_KEY:re_DcKLDdbf_GFAwUc8ptdLsUEheVfexkD}
   from-email: ${SEND_EMAIL_FROM:noreply@jmscommerce.in}
   base-url-email : http://localhost:5173

@@ -1,234 +1,189 @@
-Check out the frontend codebase at <a href="https://github.com/saumya123tp8/JMSCommerce_Dev_UI" target="_blank" rel="noopener noreferrer">saumya123tp8/JMSCommerce_Dev_UI</a>.
-# JMSCommerce
+# JMSCommerce — Production-Ready E-Commerce Platform
 
-Full-stack e-commerce platform built with **Java, Spring Boot, Spring Security, JPA/Hibernate, MySQL, Redis, React, Flyway and Razorpay**.
+**JMSCommerce** is a full-stack, production-oriented e-commerce platform built with **Java, Spring Boot, Spring Security, React, MySQL, Redis, Flyway, and Razorpay**.
 
-JMSCommerce is a production-oriented e-commerce application covering product discovery, category hierarchy, variants, customizations, Redis cart management, checkout, COD/online payments, orders, reviews and customer-support reports.
+It implements real-world commerce workflows including **product discovery, variants, customizations, Redis-backed cart management, checkout, COD/online payments, inventory reservation, orders, reviews, and customer support reports**.
 
-## Table of Contents
+### 🚀 Live Demo
+**[https://jmscommerce.in](https://jmscommerce.in)**
 
-- Overview
-- Features
-- Technology Stack
-- Architecture
-- Domain Model
-- Authentication & Authorization
-- Product Catalog
-- Category & Specification Inheritance
-- Variants
-- Customization
-- Cart & Redis
-- Orders
-- Payments & Razorpay
-- Inventory Reservation
-- Reviews
-- Order Reports
-- Database & Flyway
-- API Design
-- Validation & Exceptions
-- Concurrency
-- Observability
-- Project Structure
-- Local Setup
-- Configuration
-- API Modules
-- Frontend
-- Testing
-- Engineering Decisions
-- Future Improvements
+## 🔐 Test Credentials
+- **ADMIN**
+- **Email:** `testadmin@gmai.com`
+- **Password:** `Admin@123`
+
+- **USER - use this or register/google Oauth**
+- **Email:** `tonystark123@gmail.com`
+- **Password:** `TonyStark@123`
+
+### 💻 Source Code
+
+- **Backend:** [JMSCommerce_dev](https://github.com/saumya123tp8/JMSCommerce_dev)
+- **Frontend:** [JMSCommerce_Dev_UI](https://github.com/saumya123tp8/JMSCommerce_Dev_UI)
 
 ---
 
-## Overview
+## ⭐ Why This Project?
 
-The backend exposes REST APIs under:
+JMSCommerce was designed beyond a basic CRUD e-commerce application, with a focus on:
 
-```text
-/api/v1
-```
-
-Main domains:
-
-```text
-Users
-Authentication
-Authorization
-Categories
-Brands
-Products
-Specifications
-Variants
-Customizations
-Cart
-Orders
-Payments
-Reviews
-Order Reports
-Admin Operations
-```
-
-The backend follows a layered architecture:
-
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-JPA/Hibernate
-    ↓
-MySQL
-
-          ┌──────────────┐
-          │    Redis     │
-          │ Cart / TTL   │
-          └──────────────┘
-
-          ┌──────────────┐
-          │   Razorpay   │
-          │   Payments   │
-          └──────────────┘
-```
+- **Scalable data access and caching**
+- **Concurrency-safe inventory management**
+- **Failure-resilient payment processing**
+- **Secure authentication and authorization**
+- **Transactional business workflows**
+- **Production deployment using Docker and AWS**
+- **Maintainable domain-driven backend design**
 
 ---
 
-# Features
+## ✨ Key Features
 
 ### Customer
 
-- JWT authentication
-- Access/refresh token flow
+- JWT-based authentication with access/refresh tokens
 - Refresh-token rotation
-- OAuth2 support for Google and GitHub
-- User profile and verification support
+- Google and GitHub OAuth2
+- Role-based authorization
+- User profile and Email verification
 - Address management
-- Product/category/brand browsing
+- Product, category, and brand browsing
 - Product specifications
 - Product variants
 - Product customization
-- Redis-backed cart
+- Redis-backed shopping cart
 - Checkout
-- COD and online payment
-- Razorpay integration
+- Cash on Delivery
+- Razorpay online payments
 - Payment retry
 - Order tracking
 - Product reviews
 - Order issue reporting
-- User/admin report conversation
-- Report resolutions
+- Customer/admin report conversations
+- Report resolution
 
-### Admin / Developer
+### Admin
 
 - Product management
-- Category management
-- Brand management
+- Category and brand management
 - Variant management
-- Customization management
+- Customization and Specification management
 - Order operations
 - Payment operations
 - User management
-- Order-report management
+- Customer report management
 - Report status transitions
-- Admin responses
-- Report resolution
+- Admin responses and resolution
 - Application monitoring
 
 ---
 
-# Technology Stack
+# 🏗️ Architecture
 
-| Layer | Technology |
-|---|---|
-| Language | Java |
-| Backend | Spring Boot |
-| Security | Spring Security |
-| Authentication | JWT + OAuth2 |
-| ORM | JPA / Hibernate |
-| Database | MySQL |
-| Cache / Cart | Redis |
-| Migration | Flyway |
-| Payments | Razorpay |
-| Validation | Jakarta Bean Validation |
-| API | REST |
-| Frontend | React |
-| Routing | React Router |
-| HTTP Client | Axios |
-| Monitoring | Spring Boot Actuator / Micrometer |
-| Build | Gradle |
-
----
-
-# Architecture
+The backend follows a layered architecture with clear separation between API, business logic, persistence, and external integrations.
 
 ```text
                     React Frontend
                           │
-                       REST API
+                          ▼
+                     REST APIs
                           │
                           ▼
-                ┌─────────────────────┐
-                │     Controllers     │
-                └──────────┬──────────┘
-                           │
-                           ▼
-                ┌─────────────────────┐
-                │       Services      │
-                │                     │
-                │ Business Logic      │
-                │ Transactions        │
-                │ Validation          │
-                │ Authorization       │
-                └───────┬─────┬───────┘
-                        │     │
-                        ▼     ▼
-                 Repositories  Razorpay
-                        │
-                        ▼
-                     MySQL
-
-                        ▲
-                        │
-                     Redis
+                  ┌───────────────┐
+                  │  Controllers  │
+                  └───────┬───────┘
+                          │
+                          ▼
+                  ┌───────────────┐
+                  │    Services   │
+                  │               │
+                  │ Business Logic│
+                  │ Transactions  │
+                  │ Validation    │
+                  │ Authorization │__________
+                  └───────┬───────┘         │
+                          │                 │
+                    ┌─────┴─────┐           │
+                    ▼           ▼           │
+              Repositories   Razorpay       │
+                    │                       │
+                    ▼                       │
+                  MySQL                     │
+                    ▲                       │
+                    │                       │
+                  Redis ---------------------
+               Cart / TTL
 ```
 
-The project uses DTOs and adapters around the persistence model so controllers do not need to expose JPA entities directly.
+The application uses **DTOs and adapters** around the persistence model so JPA entities are not directly exposed as public API contracts.
 
 ---
 
-# Domain Model
+## 🧩 Entity Relationship Diagram
+
+The following diagram represents the core domain relationships of JMSCommerce, including product catalog, variants, cart, orders, payments, reviews, and customer reports.
+
+```mermaid
+erDiagram
+
+    USER ||--o{ ADDRESS : owns
+    USER ||--o{ ORDER : places
+    USER ||--o{ REVIEW : writes
+
+    CATEGORY ||--o{ CATEGORY : contains
+    CATEGORY ||--o{ PRODUCT : contains
+    BRAND ||--o{ PRODUCT : owns
+
+    PRODUCT_VARIANT ||--o{ VARIANT_ATTRIBUTE : has
+    PRODUCT ||--o{ PRODUCT_VARIANT : has
+    
+
+    
+    SPECIFICATION_DEFINITION ||--o{ VARIANT_ATTRIBUTE : defines
+    SPECIFICATION_DEFINITION ||--o{ PRODUCT_SPECIFICATION : defines
+
+
+    PRODUCT ||--o{ CUSTOMIZATION_GROUP : supports
+    CUSTOMIZATION_GROUP ||--o{ CUSTOMIZATION_OPTION : contains
+
+    USER ||--o{ CART : owns
+    CART ||--o{ CART_ITEM : contains
+    PRODUCT_VARIANT ||--o{ CART_ITEM : references
+    PRODUCT ||--o{ PRODUCT_SPECIFICATION : has
+    ORDER ||--o{ ORDER_ITEM : contains
+    PRODUCT_VARIANT ||--o{ ORDER_ITEM : references
+
+    ORDER ||--o| PAYMENT : has
+    PAYMENT ||--o{ PAYMENT_ATTEMPT : contains
+
+    ORDER ||--|| DELIVERY_ADDRESS : uses
+
+    ORDER ||--o{ ORDER_REPORT : has
+    ORDER_REPORT ||--o{ REPORT_MESSAGE : contains
+    ORDER_REPORT ||--o| REPORT_RESOLUTION : has
+
+    ORDER_ITEM ||--o{ ORDER_ITEM_CUSTOMIZATION : has
+    CUSTOMIZATION_OPTION ||--o{ ORDER_ITEM_CUSTOMIZATION : selected_as
+```
+# 🔐 Authentication & Authorization
+
+JMSCommerce implements JWT authentication using **access and refresh tokens**.
+
+### Authentication flow
 
 ```text
-User
- ├── Roles
- ├── Addresses
- ├── Orders
- └── Reports
-
-Category
- └── Product
-      ├── Brand
-      ├── Specifications
-      ├── Customizations
-      └── ProductVariant
-            │
-            ▼
-         OrderItem
-            │
-            ▼
-          Order
-          ├── Payment
-          │     └── PaymentAttempt
-          └── DeliveryAddress
+Login
+  ↓
+Generate Access Token
+  ↓
+Generate Refresh Token
+  ↓
+Persist Refresh Token
+  ↓
+Authenticated API Requests
 ```
 
----
-
-# Authentication & Authorization
-
-JWT authentication is implemented with access and refresh tokens.
-
-The access token contains information such as:
+The access token contains claims such as:
 
 ```text
 email / subject
@@ -240,40 +195,49 @@ expiration
 JTI
 ```
 
-Refresh tokens are persisted server-side and rotated.
-
-### Refresh flow
+### Refresh Token Rotation
 
 ```text
 Refresh Token
       ↓
 Verify JWT
       ↓
-Validate token type
+Validate Token Type
       ↓
-Find stored token by JTI
+Find Stored Token by JTI
       ↓
-Check revoked / expired
+Check Revoked / Expired
       ↓
-Validate associated user
+Validate User
       ↓
-Revoke old token
+Revoke Old Token
       ↓
-Generate new JTI
+Generate New JTI
       ↓
-Create new refresh token
+Generate New Refresh Token
       ↓
-Create new access token
+Generate New Access Token
 ```
 
-Administration uses role-based authorization, including:
+Refresh tokens are persisted server-side and rotated after successful refresh operations.
+
+### OAuth2
+
+OAuth2 login is supported through:
+
+- Google
+- GitHub
+
+### Authorization
+
+Administrative operations use role-based authorization:
 
 ```text
 ROLE_ADMIN
-ROLE_DEVELOPER
+ROLE_GUEST
 ```
 
-Protected operations use rules such as:
+Protected endpoints use Spring Security authorization rules such as:
 
 ```java
 @PreAuthorize(AppConstants.HAS_ADMIN_OR_DEVELOPER)
@@ -281,9 +245,18 @@ Protected operations use rules such as:
 
 ---
 
-# Product Catalog
+# 🛍️ Product Catalog
 
-Products contain:
+The catalog supports:
+
+- Products
+- Categories
+- Brands
+- Specifications
+- Variants
+- Customizations
+
+A product can contain information such as:
 
 ```text
 name
@@ -297,67 +270,47 @@ specifications
 inventoryType
 ```
 
-Product creation uses Jakarta validation such as:
-
-```java
-@NotBlank
-@NotNull
-@Size
-```
-
-Product names are normalized and slugs are generated.
-
-Brand association is optional.
+Product requests use Jakarta Bean Validation and product names are normalized with generated slugs.
 
 ---
 
-# Category & Specification Inheritance
+# 🌳 Hierarchical Categories & Specifications
 
-Categories are hierarchical.
+Categories support hierarchical relationships.
 
 Example:
 
 ```text
 Beverages
-   │
-   └── Hot Coffee
-          │
-          └── Cappuccino
-```
-
-Categories contain information such as:
-
-```text
-id
-name
-slug
-description
-status
-parentId
-level
-```
-
-Specification definitions can be inherited through the category hierarchy.
-
-For example, a specification defined for `Coffee` can be available to a product under:
-
-```text
-Beverages
-  ↓
+   ↓
 Coffee
-  ↓
+   ↓
 Hot Coffee
-  ↓
+   ↓
 Cappuccino
 ```
 
-The product service resolves allowed specifications through the parent hierarchy and validates submitted specification IDs.
+Specifications can be inherited through the category hierarchy.
 
-This avoids requiring every descendant category to duplicate the same specification definition.
+For example:
+
+```text
+Coffee
+   ↓
+Hot Coffee
+   ↓
+Cappuccino
+```
+
+A specification defined at a parent category can therefore be available to products under descendant categories.
+
+This avoids duplicating the same specification definitions across every child category.
 
 ---
 
-# Product Variants
+# 🎨 Product Variants & Customization
+
+## Variants
 
 A product can contain multiple variants.
 
@@ -371,7 +324,7 @@ Cappuccino
  └── Large / Cold
 ```
 
-A variant supports:
+Variants support:
 
 ```text
 MRP
@@ -383,21 +336,19 @@ attributes
 displayName
 ```
 
-The variant service validates:
+The variant workflow validates:
 
 - SKU uniqueness
 - Barcode uniqueness
 - Duplicate variants
 - Required attributes
-- Product/variant relationship
+- Product/variant relationships
 
-Variant updates also synchronize product pricing.
+Variant updates can also synchronize product pricing.
 
----
+## Customization
 
-# Customization
-
-Customization groups are attached to a product.
+Products can define customization groups and options.
 
 Example:
 
@@ -412,19 +363,17 @@ Cappuccino
       └── Caramel Drizzle +₹25
 ```
 
-A group supports:
+Customization groups support:
 
 ```text
-name
 selectionType
 required
 minSelection
 maxSelection
 displayOrder
-options
 ```
 
-An option supports:
+Options support:
 
 ```text
 name
@@ -433,44 +382,11 @@ adjustmentValue
 displayOrder
 ```
 
-Example:
-
-```json
-{
-  "groups": [
-    {
-      "name": "Milk",
-      "selectionType": "SINGLE",
-      "required": true,
-      "minSelection": 1,
-      "maxSelection": 1,
-      "displayOrder": 1,
-      "options": [
-        {
-          "name": "Regular Milk",
-          "adjustmentType": "FIXED",
-          "adjustmentValue": 0,
-          "displayOrder": 1
-        },
-        {
-          "name": "Almond Milk",
-          "adjustmentType": "FIXED",
-          "adjustmentValue": 20,
-          "displayOrder": 2
-        }
-      ]
-    }
-  ]
-}
-```
-
-The cart request can send selected customization option IDs.
-
 ---
 
-# Cart & Redis
+# 🛒 Redis-Backed Cart
 
-Redis is used for cart management.
+Redis is used for temporary cart state and high-frequency cart operations.
 
 ```text
 Frontend
@@ -480,39 +396,34 @@ Cart API
 Cart Service
    ↓
 Redis
+   ↓
+Checkout 
+   ↓
+Validate Inventory
+   ↓
+Validate current price from backend
+   ↓
+Persist current discount, price, address etc.
+   ↓
+Route to razorpay for payment
 ```
 
-The cart is temporary state while the order is being prepared.
+The cart is treated as temporary commerce state, while permanent order information remains in MySQL.
 
-Current configuration includes:
+Redis provides:
 
-```yaml
-spring:
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      timeout: 60000
-      cart:
-        ttl-days: 30
-```
+- Fast reads/writes
+- TTL-based cart expiration
+- Reduced relational database traffic
+- Temporary session-like commerce state
 
-The project also considers Redis persistence through:
-
-```text
-RDB
-AOF
-```
-
-RDB provides snapshots, while AOF records write operations.
-
-Permanent order information remains in MySQL.
+The current cart TTL configuration is **10 days**.
 
 ---
 
-# Orders
+# 📦 Order Management
 
-An order contains information including:
+Orders contain:
 
 ```text
 orderNumber
@@ -529,7 +440,7 @@ user
 payment
 ```
 
-Order items store historical commerce information:
+Order items preserve historical commerce information such as:
 
 ```text
 variant
@@ -544,9 +455,9 @@ productName
 inventoryReserved
 ```
 
-This preserves important order snapshots even if product information changes later.
+This creates **order snapshots**, ensuring historical orders remain accurate even if the product catalog changes later.
 
-## Order lifecycle
+### Order Lifecycle
 
 ```text
 PENDING
@@ -560,22 +471,20 @@ SHIPPED
 DELIVERED
 ```
 
-Cancellation is supported from applicable earlier states.
-
-Terminal states include:
+Cancellation is supported from applicable states, while terminal states include:
 
 ```text
 DELIVERED
 CANCELLED
 ```
 
-Invalid transitions are rejected by the status-transition validator.
+Invalid state transitions are rejected by transition validation.
 
 ---
 
-# Payments & Razorpay
+# 💳 Payment Processing
 
-The payment model separates the overall payment from individual attempts:
+The payment model separates a **Payment** from individual **PaymentAttempts**.
 
 ```text
 Order
@@ -588,105 +497,105 @@ Payment
   └── Attempt #3 → SUCCESS
 ```
 
-A `PaymentAttempt` stores:
+This design preserves payment-attempt history and allows failed payments to be retried without creating a new order/payment record.
 
-```text
-amount
-currency
-status
-razorpayOrderId
-razorpayPaymentId
-razorpaySignature
-initiatedAt
-paidAt
-failedAt
-failureCode
-failureMessage
-version
-```
-
-## COD flow
+## COD
 
 ```text
 Create Order
-    ↓
+     ↓
 Payment = PENDING
 Order = CONFIRMED
-    ↓
-Cart cleared
+     ↓
+Cart Cleared
 ```
 
-## Online payment flow
+## Online Payment
 
 ```text
 Create Order
-    ↓
+     ↓
 Order = PENDING
 Payment = PENDING
-    ↓
+     ↓
 Initiate Payment
-    ↓
-Create PaymentAttempt
-    ↓
+     ↓
+Create Payment Attempt
+     ↓
 Create Razorpay Order
-    ↓
+     ↓
 Razorpay Checkout
-    ↓
+     ↓
 Verify Signature
-    ↓
+     ↓
 Payment SUCCESS
-    ↓
+     ↓
 Order PaymentStatus = SUCCESS
-    ↓
+     ↓
 Order = CONFIRMED
 ```
 
-## Payment APIs
+### Payment Reliability
 
-```http
-POST  /api/v1/payments/orders/{orderId}/initiate
-POST  /api/v1/payments/verify
-POST  /api/v1/payments/webhook
-POST  /api/v1/payments/orders/{orderId}/retry
-PATCH /api/v1/payments/orders/{orderId}/attempts/{attemptId}/cancel
-```
+The payment workflow includes:
 
-Razorpay webhooks are signature-verified and handle events such as:
+- Isolated payment attempts
+- Payment retries
+- Razorpay signature verification
+- Webhook verification
+- Explicit payment states
+- Duplicate callback handling
+- Payment ownership validation
+
+Supported webhook events include:
 
 ```text
 payment.captured
 payment.failed
 ```
 
-Webhook processing is idempotent for already-successful attempts.
-
-Payment retries create a new `PaymentAttempt` while preserving the same order/payment record.
+Webhook processing is idempotent for already-successful payment attempts.
 
 ---
 
-# Inventory Reservation
+# 🔒 Concurrency & Data Integrity
 
-`OrderItem` contains:
+Concurrency is treated as a first-class concern in important commerce workflows.
+
+The application uses:
+
+- Optimistic locking/versioning
+- Transactional service methods
+- Atomic database updates
+- Inventory reservation/release
+- Payment-attempt validation
+- Explicit state-transition validation
+
+This helps protect against:
+
+- Overselling
+- Lost updates
+- Invalid order states
+- Invalid payment state transitions
+- Duplicate payment callbacks
+
+Important transactional workflows include:
 
 ```text
-inventoryReserved
+Product creation
+Variant updates
+Payment verification
+Payment webhook processing
+Payment retry
+Order workflows
+Report workflows
 ```
 
-This allows the order flow to track whether inventory for the ordered variant has been reserved.
-
-Inventory state is intentionally separated from payment state so online-payment orders can exist before successful payment.
+The common persistence model includes a `version` field for optimistic locking where applicable.
 
 ---
 
-# Reviews
-
-The application supports product ratings and reviews.
-
-The product detail frontend loads reviews independently and can refresh the review list after a review is submitted.
-
----
-
-# Order Reports
+# 🧾 Customer Order Reports
 
 Customers can report issues against their own orders.
 
@@ -713,7 +622,7 @@ createdAt
 updatedAt
 ```
 
-## Report lifecycle
+### Report Lifecycle
 
 ```text
 OPEN
@@ -725,31 +634,7 @@ RESOLVED
 CLOSED
 ```
 
-Rejected reports can also proceed toward closure.
-
-## Conversation
-
-Messages identify the sender:
-
-```text
-USER
-ADMIN
-```
-
-Example:
-
-```text
-USER:
-"I received the wrong item."
-
-ADMIN:
-"We are checking this issue with our delivery team."
-
-RESOLUTION:
-"Refund has been initiated."
-```
-
-Resolution types include:
+Reports support user/admin conversations and resolutions such as:
 
 ```text
 REFUND
@@ -760,75 +645,20 @@ NO_ACTION
 OTHER
 ```
 
-The complete workflow has been tested:
+---
 
-```text
-Create report
-    ↓
-View report
-    ↓
-User message
-    ↓
-Admin views report
-    ↓
-Status → IN_REVIEW
-    ↓
-Admin message
-    ↓
-Resolve report
-    ↓
-User sees resolution
-```
+# ⭐ Reviews
+
+Customers can submit product ratings and reviews.
+
+The product-detail frontend loads reviews independently and can refresh the review list after submission.
+
 
 ---
 
-# Database & Flyway
+# 🔄 Database Migrations
 
-MySQL is the primary relational database.
-
-JPA/Hibernate manages persistence.
-
-Major entities include:
-
-```text
-User
-Role
-Address
-Category
-Brand
-Product
-ProductVariant
-SpecificationDefinition
-ProductSpecificationValue
-VariantAttribute
-CustomizationGroup
-CustomizationOption
-Order
-OrderItem
-OrderDeliveryAddress
-Payment
-PaymentAttempt
-Review
-OrderReport
-OrderReportMessage
-OrderReportResolution
-```
-
-A common `BaseEntity` provides fields such as:
-
-```text
-id
-createdAt
-updatedAt
-deletedAt
-createdBy
-updatedBy
-version
-```
-
-where applicable.
-
-Flyway is configured for database migrations:
+**Flyway** manages database schema migrations.
 
 ```yaml
 spring:
@@ -837,23 +667,25 @@ spring:
     location: classpath:db/migration
 ```
 
-Migration files live under:
+Migration files are maintained under:
 
 ```text
 src/main/resources/db/migration
 ```
 
+This keeps database changes version-controlled and reproducible across environments.
+
 ---
 
-# API Design
+# 🌐 API Design
 
-The API base path is:
+The REST API uses the base path:
 
 ```text
 /api/v1
 ```
 
-Responses use a common wrapper:
+Responses follow a common wrapper:
 
 ```json
 {
@@ -866,13 +698,50 @@ Responses use a common wrapper:
 }
 ```
 
-This gives the frontend a consistent response contract.
+This provides the frontend with a consistent API contract.
+
+### Some of Example Endpoints
+
+#### Products
+
+```http
+GET    /api/v1/products
+POST   /api/v1/products
+GET    /api/v1/products/{id}
+GET    /api/v1/products/{id}/details
+GET    /api/v1/products/{id}/specifications
+GET    /api/v1/products/search/filter?coffee
+PUT    /api/v1/products/{id}
+```
+
+#### Payments
+
+```http
+POST  /api/v1/payments/orders/{orderId}/initiate
+POST  /api/v1/payments/verify
+POST  /api/v1/payments/webhook
+POST  /api/v1/payments/orders/{orderId}/retry
+PATCH /api/v1/payments/orders/{orderId}/attempts/{attemptId}/cancel
+```
+
+#### Order Reports
+
+```http
+POST  /api/v1/orders/{orderId}/reports
+GET   /api/v1/users/me/order-reports
+GET   /api/v1/order-reports/{reportId}
+POST  /api/v1/order-reports/{reportId}/messages
+
+GET   /api/v1/admin/order-reports
+POST  /api/v1/admin/order-reports/{reportId}/messages
+POST  /api/v1/admin/order-reports/{reportId}/resolve
+```
 
 ---
 
-# Validation & Exception Handling
+# ⚠️ Validation & Exception Handling
 
-DTO validation uses Jakarta Bean Validation:
+DTOs use Jakarta Bean Validation:
 
 ```java
 @NotBlank
@@ -885,22 +754,20 @@ DTO validation uses Jakarta Bean Validation:
 @Max
 ```
 
-Business validation covers:
+Business-level validation covers:
 
-```text
-Duplicate products
-SKU uniqueness
-Barcode uniqueness
-Duplicate variants
-Specification validity
-Order ownership
-Payment ownership
-Payment signature
-Order status transitions
-Report status transitions
-```
+- Duplicate products
+- SKU uniqueness
+- Barcode uniqueness
+- Duplicate variants
+- Specification validity
+- Order ownership
+- Payment ownership
+- Payment signatures
+- Order state transitions
+- Report state transitions
 
-The application uses custom exceptions including:
+Custom exceptions include:
 
 ```text
 BadRequestException
@@ -913,30 +780,9 @@ A global exception handler converts exceptions into consistent API responses.
 
 ---
 
-# Concurrency & Data Integrity
+# 📊 Observability
 
-The project uses optimistic locking/versioning through the common persistence model.
-
-This helps protect against lost updates in concurrent operations.
-
-Payment processing also verifies that payment identifiers belong to the expected payment attempt before changing payment state.
-
-Transactional service methods are used for important multi-step operations such as:
-
-```text
-Product creation
-Variant updates
-Payment verification
-Payment webhook processing
-Payment retry
-Order/report workflows
-```
-
----
-
-# Observability
-
-Spring Boot Actuator/Micrometer is used for application monitoring.
+The application integrates **Spring Boot Actuator and Micrometer** for application monitoring.
 
 Useful endpoints include:
 
@@ -948,24 +794,111 @@ Useful endpoints include:
 /actuator/flyway
 ```
 
-Metrics can expose JVM, HTTP and application runtime information.
+These expose application and runtime metrics such as JVM and HTTP metrics.
 
-Prometheus can be used for metrics scraping and Grafana for visualization.
-
-Sensitive endpoints should not be publicly exposed:
-
-```text
-/actuator/env
-/actuator/configprops
-/actuator/beans
-/actuator/heapdump
-/actuator/logfile
-/actuator/shutdown
-```
+Prometheus/Grafana can be used for metrics collection and visualization. Sensitive Actuator endpoints should remain protected in production.
 
 ---
 
-# Project Structure
+# ☁️ Deployment
+
+The application is **containerized with Docker and deployed on AWS**.
+
+Current deployment architecture includes:
+
+```text
+                    Internet
+                       │
+                       ▼
+                 Custom Domain
+                       │
+                       ▼
+                 AWS EC2
+                       │
+                 ┌─────┴─────┐
+                 │   Docker  │
+                 │ Backend   │
+                 └─────┬─────┘
+                       │
+              ┌────────┴────────┐
+              ▼                 ▼
+            MySQL             Redis
+
+                       │
+                       ▼
+                     S3
+                Media Storage
+```
+
+The production environment uses environment-based configuration for sensitive credentials and application settings.
+
+---
+
+
+---
+
+# 🧠 Key Engineering Decisions
+
+### DTO-Based API Boundary
+
+JPA entities are not directly exposed through public APIs.
+
+DTOs provide:
+
+- Request validation
+- Response shaping
+- Reduced coupling
+- Safer entity evolution
+- Clear frontend contracts
+
+### Payment vs PaymentAttempt
+
+Separating payment records from attempts preserves payment history and supports retries:
+
+```text
+Payment
+ ├── Attempt #1 → FAILED
+ ├── Attempt #2 → FAILED
+ └── Attempt #3 → SUCCESS
+```
+
+### Redis for Cart
+
+Cart data is temporary and frequently accessed, making Redis suitable for:
+
+- Fast reads/writes
+- TTL
+- Reduced relational DB traffic
+- Temporary commerce state
+
+Permanent order data remains in MySQL.
+
+### Order Snapshots
+
+Order items preserve historical values such as:
+
+```text
+productName
+variantName
+SKU
+MRP
+sellingPrice
+customizationPrice
+```
+
+so historical orders remain independent of future product-catalog changes.
+
+### Hierarchical Specifications
+
+Parent-category specifications can be resolved for descendant products, avoiding repeated specification definitions.
+
+### Controlled State Transitions
+
+Order and report states are explicitly validated instead of allowing arbitrary state changes, preventing invalid business states.
+
+---
+
+# 📁 Project Structure
 
 ```text
 JMSCommerce/
@@ -998,7 +931,33 @@ JMSCommerce/
 
 ---
 
-# Local Development
+# 🛠️ Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Java |
+| Backend | Spring Boot |
+| Security | Spring Security |
+| Authentication | JWT, OAuth2 |
+| ORM | JPA / Hibernate |
+| Database | MySQL |
+| Cache / Cart | Redis |
+| Migration | Flyway |
+| Payments | Razorpay |
+| Validation | Jakarta Bean Validation |
+| API | REST |
+| Frontend | React |
+| Routing | React Router |
+| HTTP Client | Axios |
+| Monitoring | Spring Boot Actuator, Micrometer |
+| Build | Gradle |
+| Containerization | Docker |
+| Cloud | AWS |
+| Media Storage | Amazon S3 |
+
+---
+
+# 🚀 Local Development
 
 ## Prerequisites
 
@@ -1015,7 +974,7 @@ JMSCommerce/
 CREATE DATABASE practice_springjpa;
 ```
 
-Configure MySQL through environment variables/local configuration.
+Configure MySQL using local configuration or environment variables.
 
 ## Redis
 
@@ -1039,7 +998,7 @@ Windows:
 gradlew.bat build
 ```
 
-Default backend URL:
+Backend:
 
 ```text
 http://localhost:8080
@@ -1053,7 +1012,7 @@ npm install
 npm run dev
 ```
 
-Default frontend URL:
+Frontend:
 
 ```text
 http://localhost:5173
@@ -1061,311 +1020,50 @@ http://localhost:5173
 
 ---
 
-# Configuration
+# 🔮 Future Improvements
 
-Use environment variables for secrets.
-
-Recommended variables:
-
-```text
-JWT_SECRET
-JWT_ISSUER
-JWT_TTL
-JWT_REFRESH_TTL
-
-GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_SECRET
-
-GITHUB_CLIENT_ID
-GITHUB_CLIENT_SECRET
-
-RAZORPAY_KEY_ID
-RAZORPAY_KEY_SECRET
-RAZORPAY_WEBHOOK_SECRET
-```
-
-Example:
-
-```yaml
-razorpay:
-  key-id: ${RAZORPAY_KEY_ID}
-  key-secret: ${RAZORPAY_KEY_SECRET}
-  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
-```
-
-Never commit:
-
-```text
-database passwords
-JWT secrets
-OAuth secrets
-Razorpay secrets
-webhook secrets
-production credentials
-```
-
----
-
-# API Modules
-
-## Categories
-
-```http
-GET    /api/v1/categories
-GET    /api/v1/categories/{id}
-POST   /api/v1/categories
-PUT    /api/v1/categories/{id}
-DELETE /api/v1/categories/{id}
-```
-
-Browsing endpoints are public; administration requires appropriate authorization.
-
-## Brands
-
-```http
-GET    /api/v1/brand
-GET    /api/v1/brand/{id}
-POST   /api/v1/brand
-PUT    /api/v1/brand/{id}
-DELETE /api/v1/brand/{id}
-```
-
-## Products
-
-```http
-GET    /api/v1/products
-POST   /api/v1/products
-GET    /api/v1/products/{id}
-GET    /api/v1/products/{id}/details
-GET    /api/v1/products/{id}/specifications
-GET    /api/v1/products/search
-PUT    /api/v1/products/{id}
-DELETE /api/v1/products/{id}
-```
-
-## Customizations
-
-```http
-POST /api/v1/products/{productId}/customizations
-GET  /api/v1/products/{productId}/customizations
-PUT  /api/v1/products/{productId}/customizations
-```
-
-## Payments
-
-```http
-POST  /api/v1/payments/orders/{orderId}/initiate
-POST  /api/v1/payments/verify
-POST  /api/v1/payments/webhook
-POST  /api/v1/payments/orders/{orderId}/retry
-PATCH /api/v1/payments/orders/{orderId}/attempts/{attemptId}/cancel
-```
-
-## Order Reports
-
-```http
-POST  /api/v1/orders/{orderId}/reports
-GET   /api/v1/users/me/order-reports
-GET   /api/v1/order-reports/{reportId}
-POST  /api/v1/order-reports/{reportId}/messages
-
-GET   /api/v1/admin/order-reports
-GET   /api/v1/admin/order-reports?status=OPEN
-GET   /api/v1/admin/order-reports/{reportId}
-PATCH /api/v1/admin/order-reports/{reportId}/status
-POST  /api/v1/admin/order-reports/{reportId}/messages
-POST  /api/v1/admin/order-reports/{reportId}/resolve
-```
-
----
-
-# Frontend
-
-The React frontend communicates with the backend through REST service modules.
-
-Major areas include:
-
-```text
-Authentication
-Product browsing
-Product details
-Variants
-Customizations
-Cart
-Checkout
-Orders
-Order details
-Reports
-Reviews
-User profile
-Admin dashboard
-```
-
-The product detail flow loads product data, specifications, variants, customizations and reviews.
-
-The checkout flow handles:
-
-```text
-Cart
- ↓
-Address
- ↓
-Order review
- ↓
-Payment selection
- ↓
-COD / Razorpay
- ↓
-Order confirmation
-```
-
----
-
-# Testing
-
-Development testing has covered important API and business workflows, including:
-
-- Authentication
-- Refresh-token rotation
-- Product creation
-- Product variants
-- Customizations
-- Category filtering
-- Payment initiation
-- Razorpay verification
-- Payment retry
-- Razorpay webhooks
-- Order reporting
-- User/admin report messages
-- Report status transitions
-- Report resolution
-- Product/review frontend integration
-
-The order-report workflow was successfully tested end-to-end:
-
-```text
-OPEN
- ↓
-IN_REVIEW
- ↓
-RESOLVED
-```
-
-including user/admin conversation and a refund resolution.
-
----
-
-# Engineering Decisions
-
-## DTO-based API boundary
-
-JPA entities are not directly used as the public API contract.
-
-DTOs provide:
-
-- Request validation
-- Response shaping
-- Reduced coupling
-- Safer entity evolution
-- Clear frontend contracts
-
-## Payment vs PaymentAttempt
-
-Separating them preserves payment history:
-
-```text
-Payment
- ├── Attempt #1 → FAILED
- ├── Attempt #2 → FAILED
- └── Attempt #3 → SUCCESS
-```
-
-## Redis for Cart
-
-Cart state is temporary and frequently accessed, making Redis suitable for:
-
-- Fast reads/writes
-- TTL
-- Reduced relational DB traffic
-- Temporary session-like commerce state
-
-Orders remain persistent in MySQL.
-
-## Order snapshots
-
-Order items retain important historical fields such as:
-
-```text
-productName
-variantName
-sku
-mrp
-sellingPrice
-customizationPrice
-```
-
-so historical orders are not dependent on the current product catalog.
-
-## Hierarchical specifications
-
-Parent category specifications can be resolved for descendant products, reducing repeated category-definition data.
-
-## Controlled state transitions
-
-Order and report states are not freely mutable. Explicit transition validation prevents invalid business states.
-
----
-
-# Future Improvements
-
-Potential future engineering work:
+Potential future engineering improvements include:
 
 - Expand automated integration-test coverage
-- Testcontainers for MySQL/Redis tests
+- Testcontainers for MySQL/Redis integration tests
 - Prometheus + Grafana dashboards
-- API documentation with OpenAPI/Swagger
-- Rate limiting
-- More advanced product search/filtering
-- Pagination across large collections
-- Improved inventory reservation/release workflow
-- Async event processing
-- CI/CD pipeline
-- Docker Compose development environment
-- Production deployment configuration
 - Centralized logging
 - Distributed tracing
+- Rate limiting
+- Advanced product search/filtering
 - More comprehensive performance testing
+- Improved inventory reservation/release workflows
+- CI/CD pipeline
 
-These are future improvements and are not claims about the current implementation.
+These are **future improvements and are not claims about the current implementation**.
 
 ---
 
-# Security Notes
+# 🔒 Production Security Notes
 
-Do not commit credentials or secrets.
+For production deployments:
 
-For production:
-
-- Protect Actuator endpoints.
-- Keep Razorpay secrets server-side.
 - Keep JWT signing secrets server-side.
-- Use secure HttpOnly refresh-token cookies.
-- Restrict administrative APIs with role-based authorization.
+- Keep Razorpay credentials server-side.
+- Verify Razorpay payment/webhook signatures on the backend.
+- Protect administrative APIs with role-based authorization.
 - Validate resource ownership for customer operations.
-- Verify payment and webhook signatures on the backend.
+- Protect sensitive Actuator endpoints.
+- Use secure refresh-token handling.
+- Never commit production credentials or secrets.
 
 ---
 
-# Project Status
+# 📌 Project Status
 
-JMSCommerce currently provides a complete working commerce flow:
+JMSCommerce currently provides a complete commerce workflow:
 
 ```text
 Authentication
       ↓
 Product Catalog
       ↓
-Category / Specifications
+Categories / Specifications
       ↓
 Variants / Customization
       ↓
@@ -1384,12 +1082,13 @@ Order Reports
 Admin Resolution
 ```
 
-The project is intended as a backend-focused, full-stack engineering project demonstrating domain modeling, REST API design, security, persistence, caching, payment integration, state management and operational concerns.
+The project demonstrates practical backend engineering across **domain modeling, REST API design, authentication, authorization, persistence, caching, transactions, concurrency, payment integration, state management, observability, and cloud deployment**.
 
 ---
 
-# Author
+## 👨‍💻 Author
 
-**JMSCommerce**
+**Saumya Keservani**
 
-Full-stack e-commerce engineering project built with Java/Spring Boot and React.
+- GitHub: [saumya123tp8](https://github.com/saumya123tp8)
+- Live Demo: [jmscommerce.in](https://jmscommerce.in)
